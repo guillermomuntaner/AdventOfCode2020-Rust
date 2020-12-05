@@ -2,6 +2,7 @@ mod input_utils;
 mod day1;
 mod day2;
 mod day3;
+mod day4;
 
 fn main() {
     let day1_input = input_utils::read_all_as::<u32>("inputs/day1");
@@ -15,4 +16,8 @@ fn main() {
     let day3_input = input_utils::read_all("inputs/day3");
     println!("Day 3 - Part 1: {}", day3::calculate_cut_trees_for_cheap_toboggan(&day3_input));
     println!("Day 3 - Part 2: {}", day3::calculate_slopes_cost_multiplied(&day3_input));
+
+    let day4_input = input_utils::read_all("inputs/day4");
+    println!("Day 4 - Part 1: {}", day4::count_valid_passwords(&day4_input));
+
 }

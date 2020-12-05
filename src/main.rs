@@ -18,6 +18,6 @@ fn main() {
     println!("Day 3 - Part 2: {}", day3::calculate_slopes_cost_multiplied(&day3_input));
 
     let day4_input = input_utils::read_all("inputs/day4");
-    println!("Day 4 - Part 1: {}", day4::count_valid_passwords(&day4_input));
-
+    println!("Day 4 - Part 1: {}", day4::count_passwords_with_all_fields(&day4_input));
+    println!("Day 4 - Part 2: {}", day4::count_valid_passwords(&day4_input));
 }

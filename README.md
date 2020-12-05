@@ -7,7 +7,7 @@ Trying [Rust](https://www.rust-lang.org/learn/get-started) with the [Advent of C
 |---|:---:|
 | 1 |⭐️⭐ |
 | 2 |⭐️⭐ |
-| 3 |⭐   |
+| 3 |⭐⭐ |
 | 4 |     |
 | 5 |     |
 | 6 |     |

@@ -3,6 +3,7 @@ mod day1;
 mod day2;
 mod day3;
 mod day4;
+mod day5;
 
 fn main() {
     let day1_input = input_utils::read_all_as::<u32>("inputs/day1");
@@ -20,4 +21,8 @@ fn main() {
     let day4_input = input_utils::read_all("inputs/day4");
     println!("Day 4 - Part 1: {}", day4::count_passwords_with_all_fields(&day4_input));
     println!("Day 4 - Part 2: {}", day4::count_valid_passwords(&day4_input));
+
+    let day5_input = input_utils::read_all("inputs/day5");
+    println!("Day 5 - Part 1: {}", day5::find_highest_id(&day5_input));
+
 }

@@ -75,6 +75,34 @@ pub fn find_highest_id(lines: &Vec<String>) -> i32 {
         .max().unwrap()
 }
 
+// --- Part Two ---
+// Ding! The "fasten seat belt" signs have turned on. Time to find your seat.
+//
+// It's a completely full flight, so your seat should be the only missing boarding pass in your
+// list. However, there's a catch: some of the seats at the very front and back of the plane don't
+// exist on this aircraft, so they'll be missing from your list as well.
+//
+// Your seat wasn't at the very front or back, though; the seats with IDs +1 and -1 from yours will
+// be in your list.
+//
+// What is the ID of your seat?
+
+pub fn find_seat_id(lines: &Vec<String>) -> i32 {
+    let existing_ids: Vec<i32> = lines.iter()
+        .map(|line| parse_boarding_pass(line))
+        .map(|(row, column)| id(row, column))
+        .collect();
+
+    let min = existing_ids.iter().min().unwrap();
+    let max = existing_ids.iter().max().unwrap();
+    for i in (*min+1)..*max {
+        if !existing_ids.contains(&i) {
+            return i
+        }
+    }
+    panic!("Seat it not found");
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

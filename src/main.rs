@@ -24,5 +24,5 @@ fn main() {
 
     let day5_input = input_utils::read_all("inputs/day5");
     println!("Day 5 - Part 1: {}", day5::find_highest_id(&day5_input));
-
+    println!("Day 5 - Part 2: {}", day5::find_seat_id(&day5_input));
 }

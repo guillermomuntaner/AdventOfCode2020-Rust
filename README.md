@@ -5,9 +5,9 @@ Trying [Rust](https://www.rust-lang.org/learn/get-started) with the [Advent of C
 ### Progress
 |Day|Stars|
 |---|:---:|
-| 1 | ⭐️⭐ |
-| 2 | ⭐️⭐ |
-| 3 |     |
+| 1 |⭐️⭐ |
+| 2 |⭐️⭐ |
+| 3 |⭐   |
 | 4 |     |
 | 5 |     |
 | 6 |     |

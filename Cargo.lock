@@ -4,6 +4,7 @@
 name = "advent_of_code2020_rust"
 version = "0.1.0"
 dependencies = [
+ "array2d",
  "lazy_static",
  "regex",
 ]
@@ -16,6 +17,12 @@ checksum = "7404febffaa47dac81aa44dba71523c9d069b1bdc50a77db41195149e17f68e5"
 dependencies = [
  "memchr",
 ]
+
+[[package]]
+name = "array2d"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "224b2db9d3e7dd068c8b07b186076ee668ce38810d0ba12c80dacbcbb7cfc9e8"
 
 [[package]]
 name = "lazy_static"

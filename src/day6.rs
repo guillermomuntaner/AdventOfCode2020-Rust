@@ -40,6 +40,7 @@
 
 use std::collections::HashSet;
 use std::iter::FromIterator;
+use reduce::Reduce;
 
 pub fn find_total_number_of_unique_yes(lines: &Vec<String>) -> usize {
     return lines
@@ -48,6 +49,61 @@ pub fn find_total_number_of_unique_yes(lines: &Vec<String>) -> usize {
             let group_replies = group.iter().flat_map(|line| line.chars().collect::<Vec<char>>()).collect::<Vec<char>>();
             let unique_group_replies: HashSet<&char> = HashSet::from_iter(group_replies.iter());
             return unique_group_replies.len();
+        })
+        .fold(0_usize, |a, b| a + b);
+}
+
+
+// --- Part Two ---
+// As you finish the last group's customs declaration, you notice that you misread one word in the
+// instructions:
+//
+// You don't need to identify the questions to which anyone answered "yes"; you need to identify the
+// questions to which everyone answered "yes"!
+//
+// Using the same example as above:
+//
+// abc
+//
+// a
+// b
+// c
+//
+// ab
+// ac
+//
+// a
+// a
+// a
+// a
+//
+// b
+// This list represents answers from five groups:
+//
+// In the first group, everyone (all 1 person) answered "yes" to 3 questions: a, b, and c.
+// In the second group, there is no question to which everyone answered "yes".
+// In the third group, everyone answered yes to only 1 question, a. Since some people did not answer
+// "yes" to b or c, they don't count.
+// In the fourth group, everyone answered yes to only 1 question, a.
+// In the fifth group, everyone (all 1 person) answered "yes" to 1 question, b.
+// In this example, the sum of these counts is 3 + 0 + 1 + 1 + 1 = 6.
+//
+// For each group, count the number of questions to which everyone answered "yes". What is the sum
+// of those counts?
+pub fn find_total_number_of_perfect_yes(lines: &Vec<String>) -> usize {
+    return lines
+        .split(|line| line.is_empty())
+        .map(|group| {
+            let group_replies: Vec<HashSet<char>> = group.iter().map(|line| {
+                let chars_vec: Vec<char> = line.chars().collect();
+                let hash_set: HashSet<char> = HashSet::from_iter(chars_vec);
+                return hash_set;
+            }).collect();
+            let group_replies_intersection = group_replies.iter().cloned().reduce(|a, b| {
+                let intersection: HashSet<char> = a.intersection(&b).cloned().collect();
+                return intersection;
+            }).unwrap();
+            return group_replies_intersection.len();
         })
         .fold(0_usize, |a, b| a + b);
 }

@@ -28,5 +28,6 @@ fn main() {
     println!("Day 5 - Part 2: {}", day5::find_seat_id(&day5_input));
 
     let day6_input = input_utils::read_all("inputs/day6");
-    println!("Day 5 - Part 1: {}", day6::find_total_number_of_unique_yes(&day6_input));
+    println!("Day 6 - Part 1: {}", day6::find_total_number_of_unique_yes(&day6_input));
+    println!("Day 6 - Part 2: {}", day6::find_total_number_of_perfect_yes(&day6_input));
 }

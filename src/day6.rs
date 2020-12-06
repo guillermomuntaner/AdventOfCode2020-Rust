@@ -42,15 +42,17 @@ use std::collections::HashSet;
 use std::iter::FromIterator;
 use reduce::Reduce;
 
-pub fn find_total_number_of_unique_yes(lines: &Vec<String>) -> usize {
+pub fn count_number_of_unique_group_yes_answers(lines: &Vec<String>) -> usize {
     return lines
         .split(|line| line.is_empty())
         .map(|group| {
-            let group_replies = group.iter().flat_map(|line| line.chars().collect::<Vec<char>>()).collect::<Vec<char>>();
-            let unique_group_replies: HashSet<&char> = HashSet::from_iter(group_replies.iter());
-            return unique_group_replies.len();
+            let yes_answers = group.iter()
+                .flat_map(|person| person.chars().collect::<Vec<char>>())
+                .collect::<Vec<char>>();
+            let unique_yes_answers = HashSet::<char>::from_iter(yes_answers);
+            unique_yes_answers.len()
         })
-        .fold(0_usize, |a, b| a + b);
+        .sum();
 }
 
 
@@ -90,20 +92,15 @@ pub fn find_total_number_of_unique_yes(lines: &Vec<String>) -> usize {
 //
 // For each group, count the number of questions to which everyone answered "yes". What is the sum
 // of those counts?
-pub fn find_total_number_of_perfect_yes(lines: &Vec<String>) -> usize {
+pub fn count_number_of_unanimous_group_yes_answers(lines: &Vec<String>) -> usize {
     return lines
         .split(|line| line.is_empty())
-        .map(|group| {
-            let group_replies: Vec<HashSet<char>> = group.iter().map(|line| {
-                let chars_vec: Vec<char> = line.chars().collect();
-                let hash_set: HashSet<char> = HashSet::from_iter(chars_vec);
-                return hash_set;
-            }).collect();
-            let group_replies_intersection = group_replies.iter().cloned().reduce(|a, b| {
-                let intersection: HashSet<char> = a.intersection(&b).cloned().collect();
-                return intersection;
-            }).unwrap();
-            return group_replies_intersection.len();
-        })
-        .fold(0_usize, |a, b| a + b);
+        .map(|group|
+            group.iter()
+                .map(|line| HashSet::<char>::from_iter(line.chars()))
+                .reduce(|a, b| a.intersection(&b).cloned().collect())
+                .unwrap()
+                .len()
+        )
+        .sum()
 }

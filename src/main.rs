@@ -4,6 +4,7 @@ mod day2;
 mod day3;
 mod day4;
 mod day5;
+mod day6;
 
 fn main() {
     let day1_input = input_utils::read_all_as::<u32>("inputs/day1");
@@ -25,4 +26,7 @@ fn main() {
     let day5_input = input_utils::read_all("inputs/day5");
     println!("Day 5 - Part 1: {}", day5::find_highest_id(&day5_input));
     println!("Day 5 - Part 2: {}", day5::find_seat_id(&day5_input));
+
+    let day6_input = input_utils::read_all("inputs/day6");
+    println!("Day 5 - Part 1: {}", day6::find_total_number_of_unique_yes(&day6_input));
 }

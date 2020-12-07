@@ -5,6 +5,7 @@ mod day3;
 mod day4;
 mod day5;
 mod day6;
+mod day7;
 
 fn main() {
     let day1_input = input_utils::read_all_as::<u32>("inputs/day1");
@@ -30,4 +31,8 @@ fn main() {
     let day6_input = input_utils::read_all("inputs/day6");
     println!("Day 6 - Part 1: {}", day6::count_number_of_unique_group_yes_answers(&day6_input));
     println!("Day 6 - Part 2: {}", day6::count_number_of_unanimous_group_yes_answers(&day6_input));
+
+    let day7_input = input_utils::read_all("inputs/day7");
+    println!("Day 7 - Part 1: {}", day7::count_bags_containing_shiny_gold(&day7_input));
+
 }

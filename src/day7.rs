@@ -43,7 +43,9 @@ use lazy_static::lazy_static;
 use regex::{Regex, Captures};
 use std::collections::HashMap;
 
-fn parse_bag_rule(line: &String) -> (String, Vec<(String, usize)>) {
+type InnerBagsRules = Vec<(String, usize)>;
+
+fn parse_bag_rule(line: &String) -> (String, InnerBagsRules) {
     lazy_static! {
         static ref OUTER_REGEX: Regex = Regex::new(r"([a-z]+ [a-z]+) bags contain").unwrap();
         static ref INNER_REGEX: Regex = Regex::new(r"(\d+) ([a-z]+ [a-z]+) bags?").unwrap();
@@ -51,55 +53,57 @@ fn parse_bag_rule(line: &String) -> (String, Vec<(String, usize)>) {
 
     let outer: Captures = OUTER_REGEX.captures(line).unwrap();
     let outer_bag_color = outer.get(1).unwrap().as_str().to_string();
-    //println!("{} contains:", outer_bag_color);
 
     let mut inner_bags: Vec<(String, usize)> = Vec::new();
     for inner_cap in INNER_REGEX.captures_iter(line) {
         let inner_bag_count = inner_cap.get(1).unwrap().as_str().parse::<usize>().unwrap();
         let inner_bag_color = inner_cap.get(2).unwrap().as_str().to_string();
-        //println!("- {} {} bag(s)", inner_bag_count, inner_bag_color);
         inner_bags.push((inner_bag_color, inner_bag_count));
     }
 
     return (outer_bag_color, inner_bags)
 }
 
-pub fn count_bags_containing_shiny_gold(lines: &Vec<String>) -> usize {
-    // Dictionary of rules
-    let mut rules: HashMap<String, Vec<String>> = HashMap::new();
+/// Return a dictionary of bag colors : inner bags rules.
+fn parse_bag_rules(lines: &Vec<String>) -> HashMap<String, InnerBagsRules> {
+    let mut rules: HashMap<String, Vec<(String, usize)>> = HashMap::new();
     for line in lines.iter() {
-        let rule =  parse_bag_rule(line);
-        rules.insert(rule.0, rule.1.iter().map(|r| r.0.clone()).collect());
+        let (bag_color, inner_rules) =  parse_bag_rule(line);
+        rules.insert(bag_color, inner_rules);
     }
+    return rules
+}
+
+pub fn count_bags_containing_shiny_gold(lines: &Vec<String>) -> usize {
+    let rules = parse_bag_rules(lines);
 
     // Cache of already checked bags
-    let mut contains = HashMap::<String, bool>::new();
+    let mut cache = HashMap::<String, bool>::new();
 
-    fn find_if_contains_shiny_gold(rules: &HashMap<String, Vec<String>>, contains: &mut HashMap<String, bool>, bag_color: &String) -> bool {
-        match contains.get(bag_color) {
-            Some(contains_bag_color) => {
-                return *contains_bag_color;
-            }
-            None => {
-                for inner_color in rules.get(bag_color).unwrap().iter() {
-                    if inner_color == "shiny gold" {
-                        contains.insert(bag_color.clone(), true);
-                        return true
-                    } else if find_if_contains_shiny_gold(rules, contains, inner_color) {
-                        contains.insert(bag_color.clone(), true);
-                        return true
-                    }
+    fn contains_shiny_gold(
+        rules: &HashMap<String, InnerBagsRules>,
+        contains: &mut HashMap<String, bool>,
+        bag_color: &String
+    ) -> bool {
+        return contains.get(bag_color).copied().unwrap_or_else(|| {
+            for (inner_color, _) in rules.get(bag_color).unwrap().iter() {
+                if inner_color == "shiny gold" {
+                    contains.insert(bag_color.clone(), true);
+                    return true
+                } else if contains_shiny_gold(rules, contains, inner_color) {
+                    contains.insert(bag_color.clone(), true);
+                    return true
                 }
-                contains.insert(bag_color.clone(), false);
-                return false
             }
-        }
+            contains.insert(bag_color.clone(), false);
+            return false
+        })
     }
 
     // Iterate over all rule colors.
     let mut count = 0_usize;
-    for (bag_color, _) in &rules {
-        if find_if_contains_shiny_gold(&rules, &mut contains, bag_color) {
+    for (bag_color, _) in rules.iter() {
+        if contains_shiny_gold(&rules, &mut cache, &bag_color) {
             count += 1
         }
     }
@@ -137,36 +141,28 @@ pub fn count_bags_containing_shiny_gold(lines: &Vec<String>) -> usize {
 // How many individual bags are required inside your single shiny gold bag?
 
 pub fn count_bags_inside_shiny_gold(lines: &Vec<String>) -> usize {
-    // Dictionary of rules
-    let mut rules: HashMap<String, Vec<(String, usize)>> = HashMap::new();
-    for line in lines.iter() {
-        let rule =  parse_bag_rule(line);
-        rules.insert(rule.0, rule.1);
-    }
+    let rules = parse_bag_rules(lines);
 
     // Cache of already checked bags & their capacity
-    let mut capacities_cache = HashMap::<String, usize>::new();
+    let mut cache = HashMap::<String, usize>::new();
 
-    fn find_capacity(rules: &HashMap<String, Vec<(String, usize)>>, capacities_cache: &mut HashMap<String, usize>, bag_color: &String) -> usize {
-        match capacities_cache.get(bag_color) {
-            Some(quantity) => {
-                return *quantity;
+    fn find_capacity(
+        rules: &HashMap<String, InnerBagsRules>,
+        cache: &mut HashMap<String, usize>,
+        bag_color: &String
+    ) -> usize {
+        return cache.get(bag_color).copied().unwrap_or_else(|| {
+            let mut count = 0_usize;
+            for (inner_color, quantity) in rules.get(bag_color).unwrap().iter() {
+                // Add the (bag iself + the inner bags) * number of times
+                count += (1 + find_capacity(rules, cache, inner_color)) * quantity;
             }
-            None => {
-                let mut count = 0_usize;
-                for inner_color in rules.get(bag_color).unwrap().iter() {
-                    let inner_count = find_capacity(rules, capacities_cache, &inner_color.0);
-                    println!("Need {} x {} which each contain {}", inner_color.1, inner_color.0, inner_count);
-                    // Add the (bag iself + the inner bags) * number of times
-                    count += inner_color.1 * (1 + inner_count);
-                }
-                capacities_cache.insert(bag_color.clone(), count);
-                return count
-            }
-        }
+            cache.insert(bag_color.clone(), count);
+            return count;
+        })
     }
 
-    return find_capacity(&rules, &mut capacities_cache, &"shiny gold".to_string())
+    return find_capacity(&rules, &mut cache, &"shiny gold".to_string())
 }
 
 

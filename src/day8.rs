@@ -59,9 +59,9 @@ use lazy_static::lazy_static;
 use regex::{Regex, Captures};
 use std::collections::HashSet;
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone)]
 enum Instruction {
-    Nop,
+    Nop(i32),
     Acc(i32),
     Jmp(i32)
 }
@@ -75,7 +75,7 @@ fn parse_instruction(line: &String) -> Instruction {
     let operation = cap.get(1).unwrap().as_str();
     let argument = cap.get(2).unwrap().as_str().parse::<i32>().unwrap();
     return match operation {
-        "nop" => Instruction::Nop,
+        "nop" => Instruction::Nop(argument),
         "acc" => Instruction::Acc(argument),
         "jmp" => Instruction::Jmp(argument),
         _ => panic!("Unexpected instruction: {}", line)
@@ -86,25 +86,105 @@ fn parse_instructions(lines: &Vec<String>) -> Vec<Instruction> {
     lines.iter().map(|line| parse_instruction(line)).collect()
 }
 
-pub fn accumulator_value_before_entering_loop(lines: &Vec<String>) -> i32 {
-    let instructions = parse_instructions(lines);
-
+fn run_program(instructions: &Vec<Instruction>) -> Result<i32, (i32, usize)> {
     let mut accumulator = 0_i32;
     let mut position = 0_usize;
     let mut accessed_instructions = HashSet::<usize>::new();
     loop {
-        if accessed_instructions.contains(&position) { break; }
+        if position >= instructions.len() {
+            break;
+        }
+        let current_position = position;
         accessed_instructions.insert(position);
         match instructions[position] {
-            Instruction::Nop => position += 1,
+            Instruction::Nop(_) => position += 1,
             Instruction::Acc(acc) => {
                 accumulator += acc;
                 position += 1;
             }
             Instruction::Jmp(pos) => position = ((position as i32) + pos) as usize
         }
+        if accessed_instructions.contains(&position) {
+            return Err((accumulator, current_position))
+        }
     }
-    return accumulator
+    return Ok(accumulator)
+}
+
+pub fn accumulator_value_before_entering_loop(lines: &Vec<String>) -> i32 {
+    let instructions = parse_instructions(lines);
+    match run_program(&instructions) {
+        Ok(_) => panic!("Expected an infinite loop"),
+        Err(err) => err.0.clone()
+    }
+}
+
+// --- Part Two ---
+// After some careful analysis, you believe that exactly one instruction is corrupted.
+//
+// Somewhere in the program, either a jmp is supposed to be a nop, or a nop is supposed to be a jmp.
+// (No acc instructions were harmed in the corruption of this boot code.)
+//
+// The program is supposed to terminate by attempting to execute an instruction immediately after
+// the last instruction in the file. By changing exactly one jmp or nop, you can repair the boot
+// code and make it terminate correctly.
+//
+// For example, consider the same program from above:
+//
+// nop +0
+// acc +1
+// jmp +4
+// acc +3
+// jmp -3
+// acc -99
+// acc +1
+// jmp -4
+// acc +6
+// If you change the first instruction from nop +0 to jmp +0, it would create a single-instruction
+// infinite loop, never leaving that instruction. If you change almost any of the jmp instructions,
+// the program will still eventually find another jmp instruction and loop forever.
+//
+// However, if you change the second-to-last instruction (from jmp -4 to nop -4), the program
+// terminates! The instructions are visited in this order:
+//
+// nop +0  | 1
+// acc +1  | 2
+// jmp +4  | 3
+// acc +3  |
+// jmp -3  |
+// acc -99 |
+// acc +1  | 4
+// nop -4  | 5
+// acc +6  | 6
+// After the last instruction (acc +6), the program terminates by attempting to run the instruction
+// below the last instruction in the file. With this change, after the program terminates, the accumulator contains the value 8 (acc +1, acc +1, acc +6).
+//
+// Fix the program so that it terminates normally by changing exactly one jmp (to nop) or nop (to
+// jmp). What is the value of the accumulator after the program terminates?
+
+pub fn accumulator_value_fixing_loop(lines: &Vec<String>) -> i32 {
+    let instructions = parse_instructions(lines);
+
+    let mut position = 0_usize;
+    while position < instructions.len() {
+        let mut modified_instructions = instructions.clone();
+        match instructions[position] {
+            Instruction::Nop(argument) => modified_instructions[position] = Instruction::Jmp(argument.clone()),
+            Instruction::Acc(_) => {
+                position += 1;
+                continue
+            },
+            Instruction::Jmp(argument) => modified_instructions[position] = Instruction::Nop(argument.clone()),
+        }
+
+        match run_program(&modified_instructions) {
+            Ok(acc) => return acc,
+            Err(_) => {}
+        }
+
+        position += 1;
+    }
+    panic!("Didn't found any permutation that solves the loop");
 }
 
 #[cfg(test)]
@@ -113,7 +193,7 @@ mod tests {
 
     #[test]
     pub fn test_parse_instruction() {
-        assert_eq!(parse_instruction(&String::from("nop +0")), Instruction::Nop);
+        assert_eq!(parse_instruction(&String::from("nop +0")), Instruction::Nop(0));
         assert_eq!(parse_instruction(&String::from("acc -117")), Instruction::Acc(-117));
         assert_eq!(parse_instruction(&String::from("jmp +99")), Instruction::Jmp(99));
     }

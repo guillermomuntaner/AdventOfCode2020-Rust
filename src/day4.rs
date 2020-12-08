@@ -54,7 +54,7 @@
 // Count the number of valid passports - those that have all required fields. Treat cid as optional.
 // In your batch file, how many passports are valid?
 
-pub fn count_passwords_with_all_fields(lines: &Vec<String>) -> i32 {
+pub fn count_passwords_with_all_fields(lines: &[String]) -> i32 {
     let mut byr = false;
     let mut iyr = false;
     let mut eyr = false;
@@ -109,7 +109,7 @@ pub fn count_passwords_with_all_fields(lines: &Vec<String>) -> i32 {
             }
         }
     }
-    return count;
+    count
 }
 
 // --- Part Two ---
@@ -184,65 +184,65 @@ use lazy_static::lazy_static;
 use regex::Regex;
 
 /// byr (Birth Year) - four digits; at least 1920 and at most 2002.
-fn has_valid_byr(line: &String) -> bool {
+fn has_valid_byr(line: &str) -> bool {
     lazy_static! {
         static ref BYR_REGEX: Regex = Regex::new(r"byr:(19[2-9]\d|200[012])\b").unwrap();
     }
-    return BYR_REGEX.is_match(line);
+    BYR_REGEX.is_match(line)
 }
 
 /// iyr (Issue Year) - four digits; at least 2010 and at most 2020.
-fn has_valid_iyr(line: &String) -> bool {
+fn has_valid_iyr(line: &str) -> bool {
     lazy_static! {
         static ref IYR_REGEX: Regex = Regex::new(r"iyr:(201\d|2020)\b").unwrap();
     }
-    return IYR_REGEX.is_match(line);
+    IYR_REGEX.is_match(line)
 }
 
 /// eyr (Expiration Year) - four digits; at least 2020 and at most 2030.
-fn has_valid_eyr(line: &String) -> bool {
+fn has_valid_eyr(line: &str) -> bool {
     lazy_static! {
         static ref EYR_REGEX: Regex = Regex::new(r"eyr:(202\d|2030)\b").unwrap();
     }
-    return EYR_REGEX.is_match(line);
+    EYR_REGEX.is_match(line)
 }
 
 /// hgt (Height) - a number followed by either cm or in:
 /// If cm, the number must be at least 150 and at most 193.
 /// If in, the number must be at least 59 and at most 76.
-fn has_valid_hgt(line: &String) -> bool {
+fn has_valid_hgt(line: &str) -> bool {
     lazy_static! {
         static ref HGT_REGEX: Regex =
             Regex::new(r"hgt:((?:1[5-8]\d|19[0-3])cm|(?:59|6\d|7[0-6])in)\b").unwrap();
     }
-    return HGT_REGEX.is_match(line);
+    HGT_REGEX.is_match(line)
 }
 
 /// hcl (Hair Color) - a # followed by exactly six characters 0-9 or a-f.
-fn has_valid_hcl(line: &String) -> bool {
+fn has_valid_hcl(line: &str) -> bool {
     lazy_static! {
         static ref HCL_REGEX: Regex = Regex::new(r"hcl:#[a-f0-9]{6}\b").unwrap();
     }
-    return HCL_REGEX.is_match(line);
+    HCL_REGEX.is_match(line)
 }
 
 /// ecl (Eye Color) - exactly one of: amb blu brn gry grn hzl oth.
-fn has_valid_ecl(line: &String) -> bool {
+fn has_valid_ecl(line: &str) -> bool {
     lazy_static! {
         static ref ECL_REGEX: Regex = Regex::new(r"ecl:(?:amb|blu|brn|gry|grn|hzl|oth)\b").unwrap();
     }
-    return ECL_REGEX.is_match(line);
+    ECL_REGEX.is_match(line)
 }
 
 /// pid (Passport ID) - a nine-digit number, including leading zeroes.
-fn has_valid_pid(line: &String) -> bool {
+fn has_valid_pid(line: &str) -> bool {
     lazy_static! {
         static ref PID_REGEX: Regex = Regex::new(r"pid:\d{9}\b").unwrap();
     }
-    return PID_REGEX.is_match(line);
+    PID_REGEX.is_match(line)
 }
 
-pub fn count_valid_passwords(lines: &Vec<String>) -> i32 {
+pub fn count_valid_passwords(lines: &[String]) -> i32 {
     let mut byr = false;
     let mut iyr = false;
     let mut eyr = false;
@@ -297,7 +297,7 @@ pub fn count_valid_passwords(lines: &Vec<String>) -> i32 {
             }
         }
     }
-    return count;
+    count
 }
 
 #[cfg(test)]
@@ -307,74 +307,74 @@ mod tests {
     #[test]
     pub fn test_byr_regex() {
         // byr (Birth Year) - four digits; at least 1920 and at most 2002.
-        assert_eq!(has_valid_byr(&"byr:1919".to_string()), false);
-        assert_eq!(has_valid_byr(&"asdr:1920".to_string()), false);
-        assert_eq!(has_valid_byr(&"byr:1920".to_string()), true);
-        assert_eq!(has_valid_byr(&"byr:1987".to_string()), true);
-        assert_eq!(has_valid_byr(&"byr:2002".to_string()), true);
-        assert_eq!(has_valid_byr(&"byr:2003".to_string()), false);
-        assert_eq!(has_valid_byr(&"byr:191".to_string()), false);
+        assert_eq!(has_valid_byr(&"byr:1919"), false);
+        assert_eq!(has_valid_byr(&"asdr:1920"), false);
+        assert_eq!(has_valid_byr(&"byr:1920"), true);
+        assert_eq!(has_valid_byr(&"byr:1987"), true);
+        assert_eq!(has_valid_byr(&"byr:2002"), true);
+        assert_eq!(has_valid_byr(&"byr:2003"), false);
+        assert_eq!(has_valid_byr(&"byr:191"), false);
     }
 
     #[test]
     pub fn test_iyr_regex() {
         // iyr (Issue Year) - four digits; at least 2010 and at most 2020.
-        assert_eq!(has_valid_iyr(&"iyr:1987".to_string()), false);
-        assert_eq!(has_valid_iyr(&"asdr:2010".to_string()), false);
-        assert_eq!(has_valid_iyr(&"iyr:2010".to_string()), true);
-        assert_eq!(has_valid_iyr(&"iyr:2015".to_string()), true);
-        assert_eq!(has_valid_iyr(&"iyr:2020".to_string()), true);
-        assert_eq!(has_valid_iyr(&"iyr:2021".to_string()), false);
-        assert_eq!(has_valid_iyr(&"iyr:191".to_string()), false);
+        assert_eq!(has_valid_iyr(&"iyr:1987"), false);
+        assert_eq!(has_valid_iyr(&"asdr:2010"), false);
+        assert_eq!(has_valid_iyr(&"iyr:2010"), true);
+        assert_eq!(has_valid_iyr(&"iyr:2015"), true);
+        assert_eq!(has_valid_iyr(&"iyr:2020"), true);
+        assert_eq!(has_valid_iyr(&"iyr:2021"), false);
+        assert_eq!(has_valid_iyr(&"iyr:191"), false);
     }
 
     #[test]
     pub fn test_hgt_regex() {
         // hgt (Height) - a number followed by either cm or in:
         // If cm, the number must be at least 150 and at most 193.
-        assert_eq!(has_valid_hgt(&"asdr:150cm".to_string()), false);
-        assert_eq!(has_valid_hgt(&"hgt:150ccm".to_string()), false);
-        assert_eq!(has_valid_hgt(&"hgt:149cm".to_string()), false);
-        assert_eq!(has_valid_hgt(&"hgt:150cm".to_string()), true);
-        assert_eq!(has_valid_hgt(&"hgt:177cm".to_string()), true);
-        assert_eq!(has_valid_hgt(&"hgt:193cm".to_string()), true);
-        assert_eq!(has_valid_hgt(&"hgt:194cm".to_string()), false);
+        assert_eq!(has_valid_hgt(&"asdr:150cm"), false);
+        assert_eq!(has_valid_hgt(&"hgt:150ccm"), false);
+        assert_eq!(has_valid_hgt(&"hgt:149cm"), false);
+        assert_eq!(has_valid_hgt(&"hgt:150cm"), true);
+        assert_eq!(has_valid_hgt(&"hgt:177cm"), true);
+        assert_eq!(has_valid_hgt(&"hgt:193cm"), true);
+        assert_eq!(has_valid_hgt(&"hgt:194cm"), false);
         // If in, the number must be at least 59 and at most 76.
-        assert_eq!(has_valid_hgt(&"asdr:150in".to_string()), false);
-        assert_eq!(has_valid_hgt(&"hgt:150cin".to_string()), false);
-        assert_eq!(has_valid_hgt(&"hgt:58in".to_string()), false);
-        assert_eq!(has_valid_hgt(&"hgt:59in".to_string()), true);
-        assert_eq!(has_valid_hgt(&"hgt:63in".to_string()), true);
-        assert_eq!(has_valid_hgt(&"hgt:76in".to_string()), true);
-        assert_eq!(has_valid_hgt(&"hgt:77in".to_string()), false);
+        assert_eq!(has_valid_hgt(&"asdr:150in"), false);
+        assert_eq!(has_valid_hgt(&"hgt:150cin"), false);
+        assert_eq!(has_valid_hgt(&"hgt:58in"), false);
+        assert_eq!(has_valid_hgt(&"hgt:59in"), true);
+        assert_eq!(has_valid_hgt(&"hgt:63in"), true);
+        assert_eq!(has_valid_hgt(&"hgt:76in"), true);
+        assert_eq!(has_valid_hgt(&"hgt:77in"), false);
     }
 
     #[test]
     pub fn test_ecl_regex() {
         // ecl (Eye Color) - exactly one of: amb blu brn gry grn hzl oth.
-        assert_eq!(has_valid_ecl(&"ecl:ads1".to_string()), false);
-        assert_eq!(has_valid_ecl(&"asdr:amb".to_string()), false);
-        assert_eq!(has_valid_ecl(&"ecl:amb".to_string()), true);
-        assert_eq!(has_valid_ecl(&"ecl:blu".to_string()), true);
-        assert_eq!(has_valid_ecl(&"ecl:brn".to_string()), true);
-        assert_eq!(has_valid_ecl(&"ecl:gry".to_string()), true);
-        assert_eq!(has_valid_ecl(&"ecl:grn".to_string()), true);
-        assert_eq!(has_valid_ecl(&"ecl:hzl".to_string()), true);
-        assert_eq!(has_valid_ecl(&"ecl:oth".to_string()), true);
+        assert_eq!(has_valid_ecl(&"ecl:ads1"), false);
+        assert_eq!(has_valid_ecl(&"asdr:amb"), false);
+        assert_eq!(has_valid_ecl(&"ecl:amb"), true);
+        assert_eq!(has_valid_ecl(&"ecl:blu"), true);
+        assert_eq!(has_valid_ecl(&"ecl:brn"), true);
+        assert_eq!(has_valid_ecl(&"ecl:gry"), true);
+        assert_eq!(has_valid_ecl(&"ecl:grn"), true);
+        assert_eq!(has_valid_ecl(&"ecl:hzl"), true);
+        assert_eq!(has_valid_ecl(&"ecl:oth"), true);
     }
 
     #[test]
     pub fn test_pid_regex() {
         // pid (Passport ID) - a nine-digit number, including leading zeroes.
-        assert_eq!(has_valid_pid(&"pid:ads1".to_string()), false);
-        assert_eq!(has_valid_pid(&"asdr:amb".to_string()), false);
-        assert_eq!(has_valid_pid(&"pid:zzzzzzzzz".to_string()), false);
-        assert_eq!(has_valid_pid(&"pid:900000001".to_string()), true);
-        assert_eq!(has_valid_pid(&"pid:100000001".to_string()), true);
-        assert_eq!(has_valid_pid(&"pid:900000001".to_string()), true);
-        assert_eq!(has_valid_pid(&"pid:000000001".to_string()), true);
-        assert_eq!(has_valid_pid(&"pid:000000001".to_string()), true);
-        assert_eq!(has_valid_pid(&"pid:000000001".to_string()), true);
-        assert_eq!(has_valid_pid(&"pid:0000000001".to_string()), false);
+        assert_eq!(has_valid_pid(&"pid:ads1"), false);
+        assert_eq!(has_valid_pid(&"asdr:amb"), false);
+        assert_eq!(has_valid_pid(&"pid:zzzzzzzzz"), false);
+        assert_eq!(has_valid_pid(&"pid:900000001"), true);
+        assert_eq!(has_valid_pid(&"pid:100000001"), true);
+        assert_eq!(has_valid_pid(&"pid:900000001"), true);
+        assert_eq!(has_valid_pid(&"pid:000000001"), true);
+        assert_eq!(has_valid_pid(&"pid:000000001"), true);
+        assert_eq!(has_valid_pid(&"pid:000000001"), true);
+        assert_eq!(has_valid_pid(&"pid:0000000001"), false);
     }
 }

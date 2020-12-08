@@ -34,7 +34,7 @@
 // Of course, your expense report is much larger. Find the two entries that sum to 2020; what do you
 // get if you multiply them together?
 
-pub fn part1(expenses: &Vec<u32>) -> u32 {
+pub fn part1(expenses: &[u32]) -> u32 {
     for (pos1, expense1) in expenses.iter().enumerate() {
         for (pos2, expense2) in expenses.iter().enumerate() {
             if pos1 != pos2 && expense1 + expense2 == 2020 {
@@ -54,7 +54,7 @@ pub fn part1(expenses: &Vec<u32>) -> u32 {
 // Multiplying them together produces the answer, 241861950.
 //
 // In your expense report, what is the product of the three entries that sum to 2020?
-pub fn part2(expenses: &Vec<u32>) -> u32 {
+pub fn part2(expenses: &[u32]) -> u32 {
     for (pos1, expense1) in expenses.iter().enumerate() {
         for (pos2, expense2) in expenses.iter().enumerate() {
             for (pos3, expense3) in expenses.iter().enumerate() {

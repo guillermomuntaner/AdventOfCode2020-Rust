@@ -56,14 +56,14 @@
 // Run your copy of the boot code. Immediately before any instruction is executed a second time,
 // what value is in the accumulator?
 use lazy_static::lazy_static;
-use regex::{Regex, Captures};
+use regex::{Captures, Regex};
 use std::collections::HashSet;
 
 #[derive(PartialEq, Debug, Clone)]
 enum Instruction {
     Nop(i32),
     Acc(i32),
-    Jmp(i32)
+    Jmp(i32),
 }
 
 fn parse_instruction(line: &String) -> Instruction {
@@ -71,15 +71,17 @@ fn parse_instruction(line: &String) -> Instruction {
     lazy_static! {
         static ref REGEX: Regex = Regex::new(r"^(nop|acc|jmp) ([+\-]\d+)$").unwrap();
     }
-    let cap: Captures = REGEX.captures(line).expect(&format!("Unexpected line: {}", line));
+    let cap: Captures = REGEX
+        .captures(line)
+        .expect(&format!("Unexpected line: {}", line));
     let operation = cap.get(1).unwrap().as_str();
     let argument = cap.get(2).unwrap().as_str().parse::<i32>().unwrap();
     return match operation {
         "nop" => Instruction::Nop(argument),
         "acc" => Instruction::Acc(argument),
         "jmp" => Instruction::Jmp(argument),
-        _ => panic!("Unexpected instruction: {}", line)
-    }
+        _ => panic!("Unexpected instruction: {}", line),
+    };
 }
 
 fn parse_instructions(lines: &Vec<String>) -> Vec<Instruction> {
@@ -99,21 +101,21 @@ fn run_program(instructions: &Vec<Instruction>) -> Result<i32, (i32, usize)> {
                 accumulator += acc;
                 position += 1;
             }
-            Instruction::Jmp(pos) => position = ((position as i32) + pos) as usize
+            Instruction::Jmp(pos) => position = ((position as i32) + pos) as usize,
         }
         accessed_instructions.insert(current_position);
         if accessed_instructions.contains(&position) {
-            return Err((accumulator, current_position))
+            return Err((accumulator, current_position));
         }
     }
-    return Ok(accumulator)
+    return Ok(accumulator);
 }
 
 pub fn accumulator_value_before_entering_loop(lines: &Vec<String>) -> i32 {
     let instructions = parse_instructions(lines);
     match run_program(&instructions) {
         Ok(_) => panic!("Expected an infinite loop"),
-        Err(err) => err.0.clone()
+        Err(err) => err.0.clone(),
     }
 }
 
@@ -165,11 +167,13 @@ pub fn accumulator_value_fixing_loop(lines: &Vec<String>) -> i32 {
     for position in 0..instructions.len() {
         let mut modified_instructions = instructions.clone();
         match instructions[position] {
-            Instruction::Nop(argument) =>
-                modified_instructions[position] = Instruction::Jmp(argument),
+            Instruction::Nop(argument) => {
+                modified_instructions[position] = Instruction::Jmp(argument)
+            }
             Instruction::Acc(_) => continue,
-            Instruction::Jmp(argument) =>
-                modified_instructions[position] = Instruction::Nop(argument),
+            Instruction::Jmp(argument) => {
+                modified_instructions[position] = Instruction::Nop(argument)
+            }
         }
         match run_program(&modified_instructions) {
             Ok(acc) => return acc,
@@ -185,8 +189,17 @@ mod tests {
 
     #[test]
     pub fn test_parse_instruction() {
-        assert_eq!(parse_instruction(&String::from("nop +0")), Instruction::Nop(0));
-        assert_eq!(parse_instruction(&String::from("acc -117")), Instruction::Acc(-117));
-        assert_eq!(parse_instruction(&String::from("jmp +99")), Instruction::Jmp(99));
+        assert_eq!(
+            parse_instruction(&String::from("nop +0")),
+            Instruction::Nop(0)
+        );
+        assert_eq!(
+            parse_instruction(&String::from("acc -117")),
+            Instruction::Acc(-117)
+        );
+        assert_eq!(
+            parse_instruction(&String::from("jmp +99")),
+            Instruction::Jmp(99)
+        );
     }
 }

@@ -65,27 +65,33 @@
 use array2d::Array2D;
 
 fn parse_map_line(line: &str) -> Vec<bool> {
-    line.chars().map(|char| match char {
-        '.' => false,
-        '#' => true,
-        _ => panic!("Unexpected char {}", char)
-    }).collect()
+    line.chars()
+        .map(|char| match char {
+            '.' => false,
+            '#' => true,
+            _ => panic!("Unexpected char {}", char),
+        })
+        .collect()
 }
 
-fn calculate_cut_trees_for_toboggan(tree_map: &Array2D<bool>, x_slope: usize, y_slope: usize) -> i32 {
+fn calculate_cut_trees_for_toboggan(
+    tree_map: &Array2D<bool>,
+    x_slope: usize,
+    y_slope: usize,
+) -> i32 {
     let width = tree_map.num_columns();
     let height = tree_map.num_rows();
     let mut x = 0;
     let mut y = 0;
     let mut count_trees = 0;
     while y < height {
-        if tree_map[(y,x)] {
+        if tree_map[(y, x)] {
             count_trees += 1
         }
         y += y_slope;
         x = (x + x_slope) % width;
     }
-    return count_trees
+    return count_trees;
 }
 
 pub fn calculate_cut_trees_for_cheap_toboggan(lines: &Vec<String>) -> i32 {
@@ -117,8 +123,9 @@ use reduce::Reduce;
 pub fn calculate_slopes_cost_multiplied(lines: &Vec<String>) -> i64 {
     let rows: Vec<Vec<bool>> = lines.iter().map(|line| parse_map_line(line)).collect();
     let tree_map = Array2D::from_rows(&rows);
-    let slopes = vec![(1,1), (3,1), (5,1), (7,1), (1,2)];
-    slopes.iter()
+    let slopes = vec![(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)];
+    slopes
+        .iter()
         .map(|slope| calculate_cut_trees_for_toboggan(&tree_map, slope.0, slope.1) as i64)
         .reduce(|a, b| a * b)
         .unwrap()
@@ -128,13 +135,18 @@ pub fn calculate_slopes_cost_multiplied(lines: &Vec<String>) -> i64 {
 mod tests {
     use super::*;
 
-    #[test] pub fn test_remainder_operator() {
+    #[test]
+    pub fn test_remainder_operator() {
         assert_eq!(2 % 5, 2);
         assert_eq!(7 % 5, 2);
     }
 
-    #[test] pub fn test_parse_map_line() {
+    #[test]
+    pub fn test_parse_map_line() {
         let line = parse_map_line(&"..##.......");
-        assert_eq!(line, vec![false, false, true, true, false, false, false, false, false, false, false]);
+        assert_eq!(
+            line,
+            vec![false, false, true, true, false, false, false, false, false, false, false]
+        );
     }
 }

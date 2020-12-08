@@ -40,7 +40,7 @@
 // How many bag colors can eventually contain at least one shiny gold bag? (The list of rules is
 // quite long; make sure you get all of it.)
 use lazy_static::lazy_static;
-use regex::{Regex, Captures};
+use regex::{Captures, Regex};
 use std::collections::HashMap;
 
 type InnerBagsRules = Vec<(String, usize)>;
@@ -61,17 +61,17 @@ fn parse_bag_rule(line: &String) -> (String, InnerBagsRules) {
         inner_bags.push((inner_bag_color, inner_bag_count));
     }
 
-    return (outer_bag_color, inner_bags)
+    return (outer_bag_color, inner_bags);
 }
 
 /// Return a dictionary of bag colors : inner bags rules.
 fn parse_bag_rules(lines: &Vec<String>) -> HashMap<String, InnerBagsRules> {
     let mut rules: HashMap<String, Vec<(String, usize)>> = HashMap::new();
     for line in lines.iter() {
-        let (bag_color, inner_rules) =  parse_bag_rule(line);
+        let (bag_color, inner_rules) = parse_bag_rule(line);
         rules.insert(bag_color, inner_rules);
     }
-    return rules
+    return rules;
 }
 
 pub fn count_bags_containing_shiny_gold(lines: &Vec<String>) -> usize {
@@ -83,21 +83,21 @@ pub fn count_bags_containing_shiny_gold(lines: &Vec<String>) -> usize {
     fn contains_shiny_gold(
         rules: &HashMap<String, InnerBagsRules>,
         contains: &mut HashMap<String, bool>,
-        bag_color: &String
+        bag_color: &String,
     ) -> bool {
         return contains.get(bag_color).copied().unwrap_or_else(|| {
             for (inner_color, _) in rules.get(bag_color).unwrap().iter() {
                 if inner_color == "shiny gold" {
                     contains.insert(bag_color.clone(), true);
-                    return true
+                    return true;
                 } else if contains_shiny_gold(rules, contains, inner_color) {
                     contains.insert(bag_color.clone(), true);
-                    return true
+                    return true;
                 }
             }
             contains.insert(bag_color.clone(), false);
-            return false
-        })
+            return false;
+        });
     }
 
     // Iterate over all rule colors.
@@ -108,7 +108,7 @@ pub fn count_bags_containing_shiny_gold(lines: &Vec<String>) -> usize {
         }
     }
 
-    return count
+    return count;
 }
 
 // --- Part Two ---
@@ -149,7 +149,7 @@ pub fn count_bags_inside_shiny_gold(lines: &Vec<String>) -> usize {
     fn find_capacity(
         rules: &HashMap<String, InnerBagsRules>,
         cache: &mut HashMap<String, usize>,
-        bag_color: &String
+        bag_color: &String,
     ) -> usize {
         return cache.get(bag_color).copied().unwrap_or_else(|| {
             let mut count = 0_usize;
@@ -159,12 +159,11 @@ pub fn count_bags_inside_shiny_gold(lines: &Vec<String>) -> usize {
             }
             cache.insert(bag_color.clone(), count);
             return count;
-        })
+        });
     }
 
-    return find_capacity(&rules, &mut cache, &"shiny gold".to_string())
+    return find_capacity(&rules, &mut cache, &"shiny gold".to_string());
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -172,23 +171,89 @@ mod tests {
 
     #[test]
     pub fn test_parse_bag_rule() {
-        assert_eq!(parse_bag_rule(&"light red bags contain 1 bright white bag, 2 muted yellow bags.".to_string()),
-                   ("light red".to_string() , vec![("bright white".to_string(), 1), ("muted yellow".to_string(), 2)]));
-        assert_eq!(parse_bag_rule(&"dark orange bags contain 3 bright white bags, 4 muted yellow bags.".to_string()),
-                   ("dark orange".to_string() , vec![("bright white".to_string(), 3), ("muted yellow".to_string(), 4)]));
-        assert_eq!(parse_bag_rule(&"bright white bags contain 1 shiny gold bag.".to_string()),
-                   ("bright white".to_string() , vec![("shiny gold".to_string(), 1)]));
-        assert_eq!(parse_bag_rule(&"muted yellow bags contain 2 shiny gold bags, 9 faded blue bags.".to_string()),
-                   ("muted yellow".to_string() , vec![("shiny gold".to_string(), 2), ("faded blue".to_string(), 9)]));
-        assert_eq!(parse_bag_rule(&"shiny gold bags contain 1 dark olive bag, 2 vibrant plum bags.".to_string()),
-                   ("shiny gold".to_string() , vec![("dark olive".to_string(), 1), ("vibrant plum".to_string(), 2)]));
-        assert_eq!(parse_bag_rule(&"dark olive bags contain 3 faded blue bags, 4 dotted black bags.".to_string()),
-                   ("dark olive".to_string() , vec![("faded blue".to_string(), 3), ("dotted black".to_string(), 4)]));
-        assert_eq!(parse_bag_rule(&"vibrant plum bags contain 5 faded blue bags, 6 dotted black bags.".to_string()),
-                   ("vibrant plum".to_string() , vec![("faded blue".to_string(), 5), ("dotted black".to_string(), 6)]));
-        assert_eq!(parse_bag_rule(&"faded blue bags contain no other bags.".to_string()),
-                   ("faded blue".to_string() , vec![]));
-        assert_eq!(parse_bag_rule(&"dotted black bags contain no other bags.".to_string()),
-                   ("dotted black".to_string() , vec![]));
+        assert_eq!(
+            parse_bag_rule(
+                &"light red bags contain 1 bright white bag, 2 muted yellow bags.".to_string()
+            ),
+            (
+                "light red".to_string(),
+                vec![
+                    ("bright white".to_string(), 1),
+                    ("muted yellow".to_string(), 2)
+                ]
+            )
+        );
+        assert_eq!(
+            parse_bag_rule(
+                &"dark orange bags contain 3 bright white bags, 4 muted yellow bags.".to_string()
+            ),
+            (
+                "dark orange".to_string(),
+                vec![
+                    ("bright white".to_string(), 3),
+                    ("muted yellow".to_string(), 4)
+                ]
+            )
+        );
+        assert_eq!(
+            parse_bag_rule(&"bright white bags contain 1 shiny gold bag.".to_string()),
+            (
+                "bright white".to_string(),
+                vec![("shiny gold".to_string(), 1)]
+            )
+        );
+        assert_eq!(
+            parse_bag_rule(
+                &"muted yellow bags contain 2 shiny gold bags, 9 faded blue bags.".to_string()
+            ),
+            (
+                "muted yellow".to_string(),
+                vec![("shiny gold".to_string(), 2), ("faded blue".to_string(), 9)]
+            )
+        );
+        assert_eq!(
+            parse_bag_rule(
+                &"shiny gold bags contain 1 dark olive bag, 2 vibrant plum bags.".to_string()
+            ),
+            (
+                "shiny gold".to_string(),
+                vec![
+                    ("dark olive".to_string(), 1),
+                    ("vibrant plum".to_string(), 2)
+                ]
+            )
+        );
+        assert_eq!(
+            parse_bag_rule(
+                &"dark olive bags contain 3 faded blue bags, 4 dotted black bags.".to_string()
+            ),
+            (
+                "dark olive".to_string(),
+                vec![
+                    ("faded blue".to_string(), 3),
+                    ("dotted black".to_string(), 4)
+                ]
+            )
+        );
+        assert_eq!(
+            parse_bag_rule(
+                &"vibrant plum bags contain 5 faded blue bags, 6 dotted black bags.".to_string()
+            ),
+            (
+                "vibrant plum".to_string(),
+                vec![
+                    ("faded blue".to_string(), 5),
+                    ("dotted black".to_string(), 6)
+                ]
+            )
+        );
+        assert_eq!(
+            parse_bag_rule(&"faded blue bags contain no other bags.".to_string()),
+            ("faded blue".to_string(), vec![])
+        );
+        assert_eq!(
+            parse_bag_rule(&"dotted black bags contain no other bags.".to_string()),
+            ("dotted black".to_string(), vec![])
+        );
     }
 }

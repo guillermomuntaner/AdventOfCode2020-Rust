@@ -42,7 +42,7 @@ use reduce::Reduce;
 use std::collections::HashSet;
 use std::iter::FromIterator;
 
-pub fn count_number_of_unique_group_yes_answers(lines: &Vec<String>) -> usize {
+pub fn count_number_of_unique_group_yes_answers(lines: &[String]) -> usize {
     return lines
         .split(|line| line.is_empty())
         .map(|group| {
@@ -92,13 +92,13 @@ pub fn count_number_of_unique_group_yes_answers(lines: &Vec<String>) -> usize {
 //
 // For each group, count the number of questions to which everyone answered "yes". What is the sum
 // of those counts?
-pub fn count_number_of_unanimous_group_yes_answers(lines: &Vec<String>) -> usize {
+pub fn count_number_of_unanimous_group_yes_answers(lines: &[String]) -> usize {
     return lines
         .split(|line| line.is_empty())
         .map(|group| {
             group
                 .iter()
-                .map(|line| HashSet::<char>::from_iter(line.chars()))
+                .map::<HashSet<char>, _>(|line| line.chars().collect())
                 .reduce(|a, b| a.intersection(&b).cloned().collect())
                 .unwrap()
                 .len()

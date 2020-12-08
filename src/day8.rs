@@ -66,30 +66,30 @@ enum Instruction {
     Jmp(i32),
 }
 
-fn parse_instruction(line: &String) -> Instruction {
+fn parse_instruction(line: &str) -> Instruction {
     //let REGEX = Regex::new(r"^(nop|acc|jmp) ([+\-]\d+)$").unwrap();
     lazy_static! {
         static ref REGEX: Regex = Regex::new(r"^(nop|acc|jmp) ([+\-]\d+)$").unwrap();
     }
     let cap: Captures = REGEX
         .captures(line)
-        .expect(&format!("Unexpected line: {}", line));
+        .unwrap_or_else(|| panic!("Unexpected line: {}", line));
     let operation = cap.get(1).unwrap().as_str();
     let argument = cap.get(2).unwrap().as_str().parse::<i32>().unwrap();
-    return match operation {
+    match operation {
         "nop" => Instruction::Nop(argument),
         "acc" => Instruction::Acc(argument),
         "jmp" => Instruction::Jmp(argument),
         _ => panic!("Unexpected instruction: {}", line),
-    };
+    }
 }
 
-fn parse_instructions(lines: &Vec<String>) -> Vec<Instruction> {
+fn parse_instructions(lines: &[String]) -> Vec<Instruction> {
     lines.iter().map(|line| parse_instruction(line)).collect()
 }
 
 /// Executes the given instructions set. If it finds a loop it returns an error.
-fn run_program(instructions: &Vec<Instruction>) -> Result<i32, (i32, usize)> {
+fn run_program(instructions: &[Instruction]) -> Result<i32, (i32, usize)> {
     let mut accumulator = 0_i32;
     let mut position = 0_usize;
     let mut accessed_instructions = HashSet::<usize>::new();
@@ -108,14 +108,14 @@ fn run_program(instructions: &Vec<Instruction>) -> Result<i32, (i32, usize)> {
             return Err((accumulator, current_position));
         }
     }
-    return Ok(accumulator);
+    Ok(accumulator)
 }
 
-pub fn accumulator_value_before_entering_loop(lines: &Vec<String>) -> i32 {
+pub fn accumulator_value_before_entering_loop(lines: &[String]) -> i32 {
     let instructions = parse_instructions(lines);
     match run_program(&instructions) {
         Ok(_) => panic!("Expected an infinite loop"),
-        Err(err) => err.0.clone(),
+        Err(err) => err.0,
     }
 }
 
@@ -162,7 +162,7 @@ pub fn accumulator_value_before_entering_loop(lines: &Vec<String>) -> i32 {
 // Fix the program so that it terminates normally by changing exactly one jmp (to nop) or nop (to
 // jmp). What is the value of the accumulator after the program terminates?
 
-pub fn accumulator_value_fixing_loop(lines: &Vec<String>) -> i32 {
+pub fn accumulator_value_fixing_loop(lines: &[String]) -> i32 {
     let instructions = parse_instructions(lines);
     for position in 0..instructions.len() {
         let mut modified_instructions = instructions.clone();
@@ -175,9 +175,8 @@ pub fn accumulator_value_fixing_loop(lines: &Vec<String>) -> i32 {
                 modified_instructions[position] = Instruction::Nop(argument)
             }
         }
-        match run_program(&modified_instructions) {
-            Ok(acc) => return acc,
-            Err(_) => {}
+        if let Ok(acc) = run_program(&modified_instructions) {
+            return acc;
         }
     }
     panic!("Didn't found any permutation that solves the loop");

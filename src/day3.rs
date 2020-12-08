@@ -91,13 +91,13 @@ fn calculate_cut_trees_for_toboggan(
         y += y_slope;
         x = (x + x_slope) % width;
     }
-    return count_trees;
+    count_trees
 }
 
-pub fn calculate_cut_trees_for_cheap_toboggan(lines: &Vec<String>) -> i32 {
+pub fn calculate_cut_trees_for_cheap_toboggan(lines: &[String]) -> i32 {
     let rows: Vec<Vec<bool>> = lines.iter().map(|line| parse_map_line(line)).collect();
     let tree_map = Array2D::from_rows(&rows);
-    return calculate_cut_trees_for_toboggan(&tree_map, 3, 1);
+    calculate_cut_trees_for_toboggan(&tree_map, 3, 1)
 }
 
 // --- Part Two ---
@@ -120,7 +120,7 @@ pub fn calculate_cut_trees_for_cheap_toboggan(lines: &Vec<String>) -> i32 {
 
 use reduce::Reduce;
 
-pub fn calculate_slopes_cost_multiplied(lines: &Vec<String>) -> i64 {
+pub fn calculate_slopes_cost_multiplied(lines: &[String]) -> i64 {
     let rows: Vec<Vec<bool>> = lines.iter().map(|line| parse_map_line(line)).collect();
     let tree_map = Array2D::from_rows(&rows);
     let slopes = vec![(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)];

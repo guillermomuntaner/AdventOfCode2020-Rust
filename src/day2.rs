@@ -43,7 +43,7 @@ fn parse_line(line: &str) -> (i32, i32, char, &str) {
     let char = cap.get(3).unwrap().as_str().parse::<char>().unwrap();
     let password = cap.get(4).unwrap().as_str();
 
-    return (min, max, char, &password);
+    (min, max, char, &password)
 }
 
 #[test]
@@ -58,7 +58,7 @@ pub fn test_parse_line() {
 fn validate(data: &(i32, i32, char, &str)) -> bool {
     let (min, max, char, password) = data;
     let occurrences = password.matches(*char).count() as i32;
-    return occurrences >= *min && occurrences <= *max;
+    occurrences >= *min && occurrences <= *max
 }
 
 #[test]
@@ -73,9 +73,9 @@ pub fn test_validate() {
     assert_eq!(validate(&(1, 3, 'b', "cdefg")), false);
 }
 
-pub fn count_valid_passwords(lines: &Vec<String>) -> usize {
+pub fn count_valid_passwords(lines: &[String]) -> usize {
     return lines
-        .into_iter()
+        .iter()
         .map(|line| parse_line(&line))
         .filter(|data| validate(data))
         .count();
@@ -118,9 +118,9 @@ pub fn test_validate_new_rules() {
     assert_eq!(validate_new_rules(&(1, 3, 'a', "ccccccccc")), false);
 }
 
-pub fn count_valid_passwords_new_rules(lines: &Vec<String>) -> usize {
+pub fn count_valid_passwords_new_rules(lines: &[String]) -> usize {
     return lines
-        .into_iter()
+        .iter()
         .map(|line| parse_line(&line))
         .filter(|data| validate_new_rules(data))
         .count();

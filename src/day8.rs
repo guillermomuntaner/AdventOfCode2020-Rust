@@ -86,16 +86,13 @@ fn parse_instructions(lines: &Vec<String>) -> Vec<Instruction> {
     lines.iter().map(|line| parse_instruction(line)).collect()
 }
 
+/// Executes the given instructions set. If it finds a loop it returns an error.
 fn run_program(instructions: &Vec<Instruction>) -> Result<i32, (i32, usize)> {
     let mut accumulator = 0_i32;
     let mut position = 0_usize;
     let mut accessed_instructions = HashSet::<usize>::new();
-    loop {
-        if position >= instructions.len() {
-            break;
-        }
+    while position < instructions.len() {
         let current_position = position;
-        accessed_instructions.insert(position);
         match instructions[position] {
             Instruction::Nop(_) => position += 1,
             Instruction::Acc(acc) => {
@@ -104,6 +101,7 @@ fn run_program(instructions: &Vec<Instruction>) -> Result<i32, (i32, usize)> {
             }
             Instruction::Jmp(pos) => position = ((position as i32) + pos) as usize
         }
+        accessed_instructions.insert(current_position);
         if accessed_instructions.contains(&position) {
             return Err((accumulator, current_position))
         }
@@ -164,25 +162,19 @@ pub fn accumulator_value_before_entering_loop(lines: &Vec<String>) -> i32 {
 
 pub fn accumulator_value_fixing_loop(lines: &Vec<String>) -> i32 {
     let instructions = parse_instructions(lines);
-
-    let mut position = 0_usize;
-    while position < instructions.len() {
+    for position in 0..instructions.len() {
         let mut modified_instructions = instructions.clone();
         match instructions[position] {
-            Instruction::Nop(argument) => modified_instructions[position] = Instruction::Jmp(argument.clone()),
-            Instruction::Acc(_) => {
-                position += 1;
-                continue
-            },
-            Instruction::Jmp(argument) => modified_instructions[position] = Instruction::Nop(argument.clone()),
+            Instruction::Nop(argument) =>
+                modified_instructions[position] = Instruction::Jmp(argument),
+            Instruction::Acc(_) => continue,
+            Instruction::Jmp(argument) =>
+                modified_instructions[position] = Instruction::Nop(argument),
         }
-
         match run_program(&modified_instructions) {
             Ok(acc) => return acc,
             Err(_) => {}
         }
-
-        position += 1;
     }
     panic!("Didn't found any permutation that solves the loop");
 }

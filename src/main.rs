@@ -6,6 +6,7 @@ mod day4;
 mod day5;
 mod day6;
 mod day7;
+mod day8;
 
 fn main() {
     let day1_input = input_utils::read_all_as::<u32>("inputs/day1");
@@ -35,6 +36,7 @@ fn main() {
     let day7_input = input_utils::read_all("inputs/day7");
     println!("Day 7 - Part 1: {}", day7::count_bags_containing_shiny_gold(&day7_input));
     println!("Day 7 - Part 2: {}", day7::count_bags_inside_shiny_gold(&day7_input));
-    // 1558 is wrong!!!
 
+    let day8_input = input_utils::read_all("inputs/day8");
+    println!("Day 8 - Part 1: {}", day8::accumulator_value_before_entering_loop(&day8_input));
 }

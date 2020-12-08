@@ -88,32 +88,43 @@ fn parse_instructions(lines: &[String]) -> Vec<Instruction> {
     lines.iter().map(|line| parse_instruction(line)).collect()
 }
 
+fn run_instruction(instruction: &Instruction, accumulator: &i32, position: &usize) -> (i32, usize) {
+    match instruction {
+        Instruction::Nop(_) => (*accumulator, position + 1),
+        Instruction::Acc(acc) => (*accumulator + *acc, position + 1),
+        Instruction::Jmp(pos) => (*accumulator, ((*position as i32) + pos) as usize),
+    }
+}
+
 /// Executes the given instructions set. If it finds a loop it returns an error.
-fn run_program(instructions: &[Instruction]) -> Result<i32, (i32, usize)> {
-    let mut accumulator = 0_i32;
-    let mut position = 0_usize;
-    let mut accessed_instructions = HashSet::<usize>::new();
+fn run_program(
+    instructions: &[Instruction],
+    accumulator: &i32,
+    position: &usize,
+    accessed_instructions: Option<&HashSet<usize>>,
+) -> Result<i32, (i32, usize)> {
+    let mut accumulator = *accumulator;
+    let mut position = *position;
+    let mut accessed_instructions = match accessed_instructions {
+        Some(accessed_instructions) => accessed_instructions.clone(),
+        None => HashSet::new(),
+    };
     while position < instructions.len() {
-        let current_position = position;
-        match instructions[position] {
-            Instruction::Nop(_) => position += 1,
-            Instruction::Acc(acc) => {
-                accumulator += acc;
-                position += 1;
-            }
-            Instruction::Jmp(pos) => position = ((position as i32) + pos) as usize,
+        let (next_accumulator, next_position) =
+            run_instruction(&instructions[position], &accumulator, &position);
+        if accessed_instructions.contains(&next_position) {
+            return Err((accumulator, position));
         }
-        accessed_instructions.insert(current_position);
-        if accessed_instructions.contains(&position) {
-            return Err((accumulator, current_position));
-        }
+        accessed_instructions.insert(position);
+        accumulator = next_accumulator;
+        position = next_position;
     }
     Ok(accumulator)
 }
 
 pub fn accumulator_value_before_entering_loop(lines: &[String]) -> i32 {
     let instructions = parse_instructions(lines);
-    match run_program(&instructions) {
+    match run_program(&instructions, &0, &0, None) {
         Ok(_) => panic!("Expected an infinite loop"),
         Err(err) => err.0,
     }
@@ -175,11 +186,53 @@ pub fn accumulator_value_fixing_loop(lines: &[String]) -> i32 {
                 modified_instructions[position] = Instruction::Nop(argument)
             }
         }
-        if let Ok(acc) = run_program(&modified_instructions) {
+        if let Ok(acc) = run_program(&modified_instructions, &0, &0, None) {
             return acc;
         }
     }
     panic!("Didn't found any permutation that solves the loop");
+}
+
+pub fn accumulator_value_fixing_loop_fast(lines: &[String]) -> i32 {
+    let instructions = parse_instructions(lines);
+    let mut accumulator = 0;
+    let mut position = 0;
+    let mut accessed_instructions = HashSet::<usize>::new();
+    while position < instructions.len() {
+        // Check if the instruction can be swapped.
+        let switched_op: Option<Instruction> = match instructions[position] {
+            Instruction::Nop(argument) => Some(Instruction::Jmp(argument)),
+            Instruction::Acc(_) => None,
+            Instruction::Jmp(argument) => Some(Instruction::Nop(argument)),
+        };
+        // If there is the option to swap, run a single step with switched instruction,
+        // then run the program from there.
+        if let Some(instruction) = switched_op {
+            let (next_accumulator, next_position) =
+                run_instruction(&instruction, &accumulator, &position);
+            if !accessed_instructions.contains(&next_position) {
+                // TODO: Loop cache?
+                if let Ok(acc) = run_program(
+                    &instructions,
+                    &next_accumulator,
+                    &next_position,
+                    Some(&accessed_instructions),
+                ) {
+                    return acc;
+                }
+            }
+        }
+        // Move 1 step further
+        let (next_accumulator, next_position) =
+            run_instruction(&instructions[position], &accumulator, &position);
+        if accessed_instructions.contains(&next_position) {
+            panic!("Both the permutation & the original instruction lead to loop");
+        }
+        accessed_instructions.insert(position);
+        accumulator = next_accumulator;
+        position = next_position;
+    }
+    accumulator
 }
 
 #[cfg(test)]

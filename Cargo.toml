@@ -11,3 +11,10 @@ regex = "1"
 lazy_static = "1"
 array2d = "0.2.1"
 reduce = "0.1.3"
+
+[dev-dependencies]
+criterion = "0.3"
+
+[[bench]]
+name = "days"
+harness = false

@@ -53,26 +53,28 @@ fn parse_boarding_pass(line: &str) -> (i32, i32) {
     let mut chars = line.chars();
     for i in 0..7 {
         if chars.next().unwrap() == 'B' {
-            row += (2 as i32).pow(6-i)
+            row += (2 as i32).pow(6 - i)
         }
     }
     for i in 0..3 {
         if chars.next().unwrap() == 'R' {
-            column += (2 as i32).pow(2-i)
+            column += (2 as i32).pow(2 - i)
         }
     }
     return (row, column);
 }
 
-fn id(row: i32, column: i32) -> i32 { 
-    return row * 8 + column
+fn id(row: i32, column: i32) -> i32 {
+    return row * 8 + column;
 }
 
 pub fn find_highest_id(lines: &Vec<String>) -> i32 {
-    lines.iter()
+    lines
+        .iter()
         .map(|line| parse_boarding_pass(line))
         .map(|(row, column)| id(row, column))
-        .max().unwrap()
+        .max()
+        .unwrap()
 }
 
 // --- Part Two ---
@@ -88,16 +90,17 @@ pub fn find_highest_id(lines: &Vec<String>) -> i32 {
 // What is the ID of your seat?
 
 pub fn find_seat_id(lines: &Vec<String>) -> i32 {
-    let existing_ids: Vec<i32> = lines.iter()
+    let existing_ids: Vec<i32> = lines
+        .iter()
         .map(|line| parse_boarding_pass(line))
         .map(|(row, column)| id(row, column))
         .collect();
 
     let min = existing_ids.iter().min().unwrap();
     let max = existing_ids.iter().max().unwrap();
-    for i in (*min+1)..*max {
+    for i in (*min + 1)..*max {
         if !existing_ids.contains(&i) {
-            return i
+            return i;
         }
     }
     panic!("Seat it not found");

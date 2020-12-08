@@ -28,7 +28,7 @@
 //
 // How many passwords are valid according to their policies?
 use lazy_static::lazy_static;
-use regex::{Regex, Captures};
+use regex::{Captures, Regex};
 
 // TODO: Read memory model
 fn parse_line(line: &str) -> (i32, i32, char, &str) {
@@ -46,7 +46,8 @@ fn parse_line(line: &str) -> (i32, i32, char, &str) {
     return (min, max, char, &password);
 }
 
-#[test] pub fn test_parse_line() {
+#[test]
+pub fn test_parse_line() {
     let (min, max, char, password) = parse_line(&"1-3 a: abcde");
     assert_eq!(min, 1);
     assert_eq!(max, 3);
@@ -60,7 +61,8 @@ fn validate(data: &(i32, i32, char, &str)) -> bool {
     return occurrences >= *min && occurrences <= *max;
 }
 
-#[test] pub fn test_validate() {
+#[test]
+pub fn test_validate() {
     // Valid examples:
     // 1-3 a: abcde
     // 2-9 c: ccccccccc
@@ -72,10 +74,11 @@ fn validate(data: &(i32, i32, char, &str)) -> bool {
 }
 
 pub fn count_valid_passwords(lines: &Vec<String>) -> usize {
-    return lines.into_iter()
+    return lines
+        .into_iter()
         .map(|line| parse_line(&line))
         .filter(|data| validate(data))
-        .count()
+        .count();
 }
 
 // --- Part Two ---
@@ -102,10 +105,11 @@ fn validate_new_rules(data: &(i32, i32, char, &str)) -> bool {
     let (min, max, char, password) = data;
     let first = password.chars().nth(*min as usize - 1).unwrap();
     let second = password.chars().nth(*max as usize - 1).unwrap();
-    return vec![first, second].iter().filter(|&c| c == char).count() == 1
+    return vec![first, second].iter().filter(|&c| c == char).count() == 1;
 }
 
-#[test] pub fn test_validate_new_rules() {
+#[test]
+pub fn test_validate_new_rules() {
     // 1-3 a: abcde is valid: position 1 contains a and position 3 does not.
     assert_eq!(validate_new_rules(&(1, 3, 'a', "abcde")), true);
     // 1-3 b: cdefg is invalid: neither position 1 nor position 3 contains b.
@@ -115,8 +119,9 @@ fn validate_new_rules(data: &(i32, i32, char, &str)) -> bool {
 }
 
 pub fn count_valid_passwords_new_rules(lines: &Vec<String>) -> usize {
-    return lines.into_iter()
+    return lines
+        .into_iter()
         .map(|line| parse_line(&line))
         .filter(|data| validate_new_rules(data))
-        .count()
+        .count();
 }

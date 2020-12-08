@@ -38,15 +38,16 @@
 //
 // For each group, count the number of questions to which anyone answered "yes". What is the sum of those counts?
 
+use reduce::Reduce;
 use std::collections::HashSet;
 use std::iter::FromIterator;
-use reduce::Reduce;
 
 pub fn count_number_of_unique_group_yes_answers(lines: &Vec<String>) -> usize {
     return lines
         .split(|line| line.is_empty())
         .map(|group| {
-            let yes_answers = group.iter()
+            let yes_answers = group
+                .iter()
                 .flat_map(|person| person.chars().collect::<Vec<char>>())
                 .collect::<Vec<char>>();
             let unique_yes_answers = HashSet::<char>::from_iter(yes_answers);
@@ -54,7 +55,6 @@ pub fn count_number_of_unique_group_yes_answers(lines: &Vec<String>) -> usize {
         })
         .sum();
 }
-
 
 // --- Part Two ---
 // As you finish the last group's customs declaration, you notice that you misread one word in the
@@ -95,12 +95,13 @@ pub fn count_number_of_unique_group_yes_answers(lines: &Vec<String>) -> usize {
 pub fn count_number_of_unanimous_group_yes_answers(lines: &Vec<String>) -> usize {
     return lines
         .split(|line| line.is_empty())
-        .map(|group|
-            group.iter()
+        .map(|group| {
+            group
+                .iter()
                 .map(|line| HashSet::<char>::from_iter(line.chars()))
                 .reduce(|a, b| a.intersection(&b).cloned().collect())
                 .unwrap()
                 .len()
-        )
-        .sum()
+        })
+        .sum();
 }

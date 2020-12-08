@@ -66,16 +66,30 @@ pub fn count_passwords_with_all_fields(lines: &Vec<String>) -> i32 {
     let mut count = 0;
     let mut iter = lines.iter();
     loop {
-        let line= iter.next();
+        let line = iter.next();
         match line {
             Some(x) if !x.is_empty() => {
-                if x.contains("byr") { byr = true }
-                if x.contains("iyr") { iyr = true }
-                if x.contains("eyr") { eyr = true }
-                if x.contains("hgt") { hgt = true }
-                if x.contains("hcl") { hcl = true }
-                if x.contains("ecl") { ecl = true }
-                if x.contains("pid") { pid = true }
+                if x.contains("byr") {
+                    byr = true
+                }
+                if x.contains("iyr") {
+                    iyr = true
+                }
+                if x.contains("eyr") {
+                    eyr = true
+                }
+                if x.contains("hgt") {
+                    hgt = true
+                }
+                if x.contains("hcl") {
+                    hcl = true
+                }
+                if x.contains("ecl") {
+                    ecl = true
+                }
+                if x.contains("pid") {
+                    pid = true
+                }
             }
             _ => {
                 if byr && iyr && eyr && hgt && hcl && ecl && pid {
@@ -95,7 +109,7 @@ pub fn count_passwords_with_all_fields(lines: &Vec<String>) -> i32 {
             }
         }
     }
-    return count
+    return count;
 }
 
 // --- Part Two ---
@@ -167,7 +181,7 @@ pub fn count_passwords_with_all_fields(lines: &Vec<String>) -> i32 {
 // Count the number of valid passports - those that have all required fields and valid values.
 // Continue to treat cid as optional. In your batch file, how many passports are valid?
 use lazy_static::lazy_static;
-use regex::{Regex};
+use regex::Regex;
 
 /// byr (Birth Year) - four digits; at least 1920 and at most 2002.
 fn has_valid_byr(line: &String) -> bool {
@@ -198,7 +212,8 @@ fn has_valid_eyr(line: &String) -> bool {
 /// If in, the number must be at least 59 and at most 76.
 fn has_valid_hgt(line: &String) -> bool {
     lazy_static! {
-        static ref HGT_REGEX: Regex = Regex::new(r"hgt:((?:1[5-8]\d|19[0-3])cm|(?:59|6\d|7[0-6])in)\b").unwrap();
+        static ref HGT_REGEX: Regex =
+            Regex::new(r"hgt:((?:1[5-8]\d|19[0-3])cm|(?:59|6\d|7[0-6])in)\b").unwrap();
     }
     return HGT_REGEX.is_match(line);
 }
@@ -239,16 +254,30 @@ pub fn count_valid_passwords(lines: &Vec<String>) -> i32 {
     let mut count = 0;
     let mut iter = lines.iter();
     loop {
-        let maybe_line= iter.next();
+        let maybe_line = iter.next();
         match maybe_line {
             Some(line) if !line.is_empty() => {
-                if has_valid_byr(line) { byr = true }
-                if has_valid_iyr(line) { iyr = true }
-                if has_valid_eyr(line) { eyr = true }
-                if has_valid_hgt(line) { hgt = true }
-                if has_valid_hcl(line) { hcl = true }
-                if has_valid_ecl(line) { ecl = true }
-                if has_valid_pid(line) { pid = true }
+                if has_valid_byr(line) {
+                    byr = true
+                }
+                if has_valid_iyr(line) {
+                    iyr = true
+                }
+                if has_valid_eyr(line) {
+                    eyr = true
+                }
+                if has_valid_hgt(line) {
+                    hgt = true
+                }
+                if has_valid_hcl(line) {
+                    hcl = true
+                }
+                if has_valid_ecl(line) {
+                    ecl = true
+                }
+                if has_valid_pid(line) {
+                    pid = true
+                }
             }
             _ => {
                 if byr && iyr && eyr && hgt && hcl && ecl && pid {
@@ -268,14 +297,15 @@ pub fn count_valid_passwords(lines: &Vec<String>) -> i32 {
             }
         }
     }
-    return count
+    return count;
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    #[test] pub fn test_byr_regex() {
+    #[test]
+    pub fn test_byr_regex() {
         // byr (Birth Year) - four digits; at least 1920 and at most 2002.
         assert_eq!(has_valid_byr(&"byr:1919".to_string()), false);
         assert_eq!(has_valid_byr(&"asdr:1920".to_string()), false);
@@ -286,7 +316,8 @@ mod tests {
         assert_eq!(has_valid_byr(&"byr:191".to_string()), false);
     }
 
-    #[test] pub fn test_iyr_regex() {
+    #[test]
+    pub fn test_iyr_regex() {
         // iyr (Issue Year) - four digits; at least 2010 and at most 2020.
         assert_eq!(has_valid_iyr(&"iyr:1987".to_string()), false);
         assert_eq!(has_valid_iyr(&"asdr:2010".to_string()), false);
@@ -297,7 +328,8 @@ mod tests {
         assert_eq!(has_valid_iyr(&"iyr:191".to_string()), false);
     }
 
-    #[test] pub fn test_hgt_regex() {
+    #[test]
+    pub fn test_hgt_regex() {
         // hgt (Height) - a number followed by either cm or in:
         // If cm, the number must be at least 150 and at most 193.
         assert_eq!(has_valid_hgt(&"asdr:150cm".to_string()), false);
@@ -317,7 +349,8 @@ mod tests {
         assert_eq!(has_valid_hgt(&"hgt:77in".to_string()), false);
     }
 
-    #[test] pub fn test_ecl_regex() {
+    #[test]
+    pub fn test_ecl_regex() {
         // ecl (Eye Color) - exactly one of: amb blu brn gry grn hzl oth.
         assert_eq!(has_valid_ecl(&"ecl:ads1".to_string()), false);
         assert_eq!(has_valid_ecl(&"asdr:amb".to_string()), false);
@@ -330,7 +363,8 @@ mod tests {
         assert_eq!(has_valid_ecl(&"ecl:oth".to_string()), true);
     }
 
-    #[test] pub fn test_pid_regex() {
+    #[test]
+    pub fn test_pid_regex() {
         // pid (Passport ID) - a nine-digit number, including leading zeroes.
         assert_eq!(has_valid_pid(&"pid:ads1".to_string()), false);
         assert_eq!(has_valid_pid(&"asdr:amb".to_string()), false);

@@ -6,6 +6,7 @@ mod day5;
 mod day6;
 mod day7;
 mod day8;
+mod day9;
 mod input_utils;
 
 fn main() {
@@ -75,6 +76,16 @@ fn main() {
     println!(
         "Day 8 - Part 2: {}",
         day8::accumulator_value_fixing_loop(&day8_input)
+    );
+
+    let day9_input = input_utils::read_all("inputs/day9");
+    println!(
+        "Day 9 - Part 1: {}",
+        day9::find_first_invalid(&day9_input, 25)
+    );
+    println!(
+        "Day 9 - Part 2: {}",
+        day9::find_vulnerability(&day9_input, 25)
     );
 }
 
@@ -152,5 +163,12 @@ mod tests {
             1521
         );
         assert_eq!(day8::accumulator_value_fixing_loop(&day8_input), 1016);
+    }
+
+    #[test]
+    pub fn test_day9() {
+        let day9_input = input_utils::read_all("inputs/day9");
+        assert_eq!(day9::find_first_invalid(&day9_input, 25), 29221323);
+        assert_eq!(day9::find_vulnerability(&day9_input, 25), 4389369);
     }
 }

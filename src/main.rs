@@ -1,4 +1,5 @@
 mod day1;
+mod day10;
 mod day2;
 mod day3;
 mod day4;
@@ -87,6 +88,16 @@ fn main() {
         "Day 9 - Part 2: {}",
         day9::find_vulnerability(&day9_input, 25)
     );
+
+    let day10_input = input_utils::read_all("inputs/day10");
+    println!(
+        "Day 10 - Part 1: {}",
+        day10::find_chain_of_adapters_hash(&day10_input)
+    );
+    println!(
+        "Day 10 - Part 2: {}",
+        day10::count_total_combinations(&day10_input)
+    );
 }
 
 /// Test all previous results stay stable.
@@ -170,5 +181,15 @@ mod tests {
         let day9_input = input_utils::read_all("inputs/day9");
         assert_eq!(day9::find_first_invalid(&day9_input, 25), 29221323);
         assert_eq!(day9::find_vulnerability(&day9_input, 25), 4389369);
+    }
+
+    #[test]
+    pub fn test_day10() {
+        let day10_input = input_utils::read_all("inputs/day10");
+        assert_eq!(day10::find_chain_of_adapters_hash(&day10_input), 1904);
+        assert_eq!(
+            day10::count_total_combinations(&day10_input),
+            10578455953408
+        );
     }
 }

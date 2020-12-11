@@ -109,12 +109,15 @@ fn parse_map_charline(char: &char) -> Seat {
     }
 }
 
-pub fn calculate_occupied_seats_after_stabilizitation(lines: &[String]) -> usize {
+fn parse_map(lines: &[String]) -> Array2D<Seat> {
     let rows: Vec<Vec<Seat>> = lines
         .iter()
         .map(|line| line.chars().map(|char| parse_map_charline(&char)).collect())
         .collect();
+    Array2D::<Seat>::from_rows(&rows)
+}
 
+fn iterate_until_stable(map: &Array2D<Seat>, search_visible: bool, threshold: i32) -> Array2D<Seat> {
     #[rustfmt::skip]
     let directions: Vec<(i32, i32)> = vec![
         (-1, 1), (0, 1), (1, 1),
@@ -122,45 +125,62 @@ pub fn calculate_occupied_seats_after_stabilizitation(lines: &[String]) -> usize
         (-1,-1), (0,-1), (1,-1),
     ];
 
-    let mut seat_map = Array2D::<Seat>::from_rows(&rows);
+    let mut seat_map = map.clone();
+
+    let valid_x = 0..seat_map.num_columns() as i32;
+    let valid_y = 0..seat_map.num_rows() as i32;
+
     loop {
         let mut changed = false;
 
-        let current_seat_map = seat_map.clone();
-        for x in 0..current_seat_map.num_columns() {
-            'outer: for y in 0..current_seat_map.num_rows() {
-                let occupied = if let Some(occ) = current_seat_map[(y, x)] {
+        let initial_seat_map = seat_map.clone();
+
+        for x in 0..initial_seat_map.num_columns() {
+            'outer: for y in 0..initial_seat_map.num_rows() {
+
+                let occupied = if let Some(occ) = initial_seat_map[(y, x)] {
                     occ
                 } else {
-                    continue;
+                    continue
                 };
 
-                let mut adjacent_occupied_seats = 0;
+                let mut occupied_seats = 0;
 
                 for direction in &directions {
-                    let target_x = x as i32 + direction.0;
-                    if target_x < 0 || target_x >= current_seat_map.num_columns() as i32 {
-                        continue;
-                    }
-                    let target_y = y as i32 + direction.1;
-                    if target_y < 0 || target_y >= current_seat_map.num_rows() as i32 {
-                        continue;
-                    }
-                    if let Some(adjacent_occupied) =
-                        current_seat_map[(target_y as usize, target_x as usize)]
-                    {
-                        if adjacent_occupied {
-                            adjacent_occupied_seats += 1;
-                            if occupied && adjacent_occupied_seats >= 4 {
-                                seat_map[(y, x)] = Some(false);
-                                changed = true;
-                                continue 'outer;
+                    let mut distance = 1;
+                    loop {
+                        let target_x = x as i32 + (direction.0 * distance);
+                        if !valid_x.contains(&target_x) { break }
+
+                        let target_y = y as i32 + (direction.1 * distance);
+                        if !valid_y.contains(&target_y) { break }
+
+                        let target_index = (target_y as usize, target_x as usize);
+
+                        let target_seat = initial_seat_map[target_index];
+
+                        if let Some(visible_seat_occupied) = target_seat {
+                            if visible_seat_occupied {
+                                occupied_seats += 1;
+
+                                if occupied && occupied_seats >= threshold {
+                                    seat_map[(y, x)] = Some(false);
+                                    changed = true;
+                                    continue 'outer;
+                                }
                             }
+                            break
+                        }
+
+                        if search_visible {
+                            distance += 1
+                        } else {
+                            break
                         }
                     }
                 }
 
-                if !occupied && adjacent_occupied_seats == 0 {
+                if !occupied && occupied_seats == 0 {
                     seat_map[(y, x)] = Some(true);
                     changed = true;
                 }
@@ -168,13 +188,20 @@ pub fn calculate_occupied_seats_after_stabilizitation(lines: &[String]) -> usize
         }
 
         if !changed {
-            break;
+            break
         }
     }
-    return seat_map
+
+    seat_map
+}
+
+pub fn part1(lines: &[String]) -> usize {
+    let map = parse_map(lines);
+    let stabilized_map = iterate_until_stable(&map, false, 4);
+    stabilized_map
         .elements_column_major_iter()
         .filter(|seat| seat.unwrap_or(false))
-        .count();
+        .count()
 }
 
 // --- Part Two ---
@@ -292,72 +319,11 @@ pub fn calculate_occupied_seats_after_stabilizitation(lines: &[String]) -> usize
 // Given the new visibility method and the rule change for occupied seats becoming empty, once
 // equilibrium is reached, how many seats end up occupied?
 
-pub fn calculate_occupied_seats_after_stabilizitation_new_rules(lines: &[String]) -> usize {
-    let rows: Vec<Vec<Seat>> = lines
-        .iter()
-        .map(|line| line.chars().map(|char| parse_map_charline(&char)).collect())
-        .collect();
-
-    #[rustfmt::skip]
-    let directions: Vec<(i32, i32)> = vec![
-        (-1, 1), (0, 1), (1, 1),
-        (-1, 0),         (1, 0),
-        (-1,-1), (0,-1), (1,-1),
-    ];
-
-    let mut seat_map = Array2D::<Seat>::from_rows(&rows);
-    loop {
-        let mut changed = false;
-
-        let current_seat_map = seat_map.clone();
-        for x in 0..current_seat_map.num_columns() {
-            'outer: for y in 0..current_seat_map.num_rows() {
-                let occupied = if let Some(occ) = current_seat_map[(y, x)] {
-                    occ
-                } else {
-                    continue;
-                };
-                let mut visible_occupied_seats = 0;
-                for direction in &directions {
-                    let mut distance = 1;
-                    loop {
-                        let target_x = x as i32 + (direction.0 * distance);
-                        if target_x < 0 || target_x >= current_seat_map.num_columns() as i32 {
-                            break;
-                        }
-                        let target_y = y as i32 + (direction.1 * distance);
-                        if target_y < 0 || target_y >= current_seat_map.num_rows() as i32 {
-                            break;
-                        }
-                        if let Some(visible_seat_occupied) =
-                            current_seat_map[(target_y as usize, target_x as usize)]
-                        {
-                            if visible_seat_occupied {
-                                visible_occupied_seats += 1;
-                                if occupied && visible_occupied_seats >= 5 {
-                                    seat_map[(y, x)] = Some(false);
-                                    changed = true;
-                                    continue 'outer;
-                                }
-                            }
-                            break;
-                        }
-                        distance += 1
-                    }
-                }
-                if !occupied && visible_occupied_seats == 0 {
-                    seat_map[(y, x)] = Some(true);
-                    changed = true;
-                }
-            }
-        }
-
-        if !changed {
-            break;
-        }
-    }
-    return seat_map
+pub fn part2(lines: &[String]) -> usize {
+    let map = parse_map(lines);
+    let stabilized_map = iterate_until_stable(&map, true, 5);
+    stabilized_map
         .elements_column_major_iter()
         .filter(|seat| seat.unwrap_or(false))
-        .count();
+        .count()
 }

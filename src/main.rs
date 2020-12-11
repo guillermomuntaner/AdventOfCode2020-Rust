@@ -1,5 +1,6 @@
 mod day1;
 mod day10;
+mod day11;
 mod day2;
 mod day3;
 mod day4;
@@ -98,6 +99,16 @@ fn main() {
         "Day 10 - Part 2: {}",
         day10::count_total_combinations(&day10_input)
     );
+
+    let day11_input = input_utils::read_all("inputs/day11");
+    println!(
+        "Day 11 - Part 1: {}",
+        day11::calculate_occupied_seats_after_stabilizitation(&day11_input)
+    );
+    println!(
+        "Day 11 - Part 2: {}",
+        day11::calculate_occupied_seats_after_stabilizitation_new_rules(&day11_input)
+    );
 }
 
 /// Test all previous results stay stable.
@@ -190,6 +201,19 @@ mod tests {
         assert_eq!(
             day10::count_total_combinations(&day10_input),
             10578455953408
+        );
+    }
+
+    #[test]
+    pub fn test_day11() {
+        let day11_input = input_utils::read_all("inputs/day11");
+        assert_eq!(
+            day11::calculate_occupied_seats_after_stabilizitation(&day11_input),
+            2249
+        );
+        assert_eq!(
+            day11::calculate_occupied_seats_after_stabilizitation_new_rules(&day11_input),
+            2023
         );
     }
 }

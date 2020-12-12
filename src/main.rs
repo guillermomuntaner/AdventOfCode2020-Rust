@@ -1,6 +1,7 @@
 mod day1;
 mod day10;
 mod day11;
+mod day12;
 mod day2;
 mod day3;
 mod day4;
@@ -103,6 +104,10 @@ fn main() {
     let day11_input = input_utils::read_all("inputs/day11");
     println!("Day 11 - Part 1: {}", day11::part1(&day11_input));
     println!("Day 11 - Part 2: {}", day11::part2(&day11_input));
+
+    let day12_input = input_utils::read_all("inputs/day12");
+    println!("Day 12 - Part 1: {}", day12::part1(&day12_input));
+    println!("Day 12 - Part 2: {}", day12::part2(&day12_input));
 }
 
 /// Test all previous results stay stable.
@@ -203,5 +208,12 @@ mod tests {
         let day11_input = input_utils::read_all("inputs/day11");
         assert_eq!(day11::part1(&day11_input), 2249);
         assert_eq!(day11::part2(&day11_input), 2023);
+    }
+
+    #[test]
+    pub fn test_day12() {
+        let day12_input = input_utils::read_all("inputs/day12");
+        assert_eq!(day12::part1(&day12_input), 1457);
+        assert_eq!(day12::part2(&day12_input), 106860);
     }
 }

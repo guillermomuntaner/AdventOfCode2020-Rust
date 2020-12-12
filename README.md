@@ -18,7 +18,7 @@ Trying [Rust](https://www.rust-lang.org/learn/get-started) with the [Advent of C
 | 9 |⭐⭐ |
 | 10|⭐⭐ |
 | 11|⭐⭐ |
-| 12|     |
+| 12|⭐⭐ |
 | 13|     |
 | 14|     |
 | 15|     |

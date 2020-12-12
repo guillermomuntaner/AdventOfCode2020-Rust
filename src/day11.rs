@@ -117,7 +117,11 @@ fn parse_map(lines: &[String]) -> Array2D<Seat> {
     Array2D::<Seat>::from_rows(&rows)
 }
 
-fn iterate_until_stable(map: &Array2D<Seat>, search_visible: bool, threshold: i32) -> Array2D<Seat> {
+fn iterate_until_stable(
+    map: &Array2D<Seat>,
+    search_visible: bool,
+    threshold: i32,
+) -> Array2D<Seat> {
     #[rustfmt::skip]
     let directions: Vec<(i32, i32)> = vec![
         (-1, 1), (0, 1), (1, 1),
@@ -137,11 +141,10 @@ fn iterate_until_stable(map: &Array2D<Seat>, search_visible: bool, threshold: i3
 
         for x in 0..initial_seat_map.num_columns() {
             'outer: for y in 0..initial_seat_map.num_rows() {
-
                 let occupied = if let Some(occ) = initial_seat_map[(y, x)] {
                     occ
                 } else {
-                    continue
+                    continue;
                 };
 
                 let mut occupied_seats = 0;
@@ -150,10 +153,14 @@ fn iterate_until_stable(map: &Array2D<Seat>, search_visible: bool, threshold: i3
                     let mut distance = 1;
                     loop {
                         let target_x = x as i32 + (direction.0 * distance);
-                        if !valid_x.contains(&target_x) { break }
+                        if !valid_x.contains(&target_x) {
+                            break;
+                        }
 
                         let target_y = y as i32 + (direction.1 * distance);
-                        if !valid_y.contains(&target_y) { break }
+                        if !valid_y.contains(&target_y) {
+                            break;
+                        }
 
                         let target_index = (target_y as usize, target_x as usize);
 
@@ -169,13 +176,13 @@ fn iterate_until_stable(map: &Array2D<Seat>, search_visible: bool, threshold: i3
                                     continue 'outer;
                                 }
                             }
-                            break
+                            break;
                         }
 
                         if search_visible {
                             distance += 1
                         } else {
-                            break
+                            break;
                         }
                     }
                 }
@@ -188,7 +195,7 @@ fn iterate_until_stable(map: &Array2D<Seat>, search_visible: bool, threshold: i3
         }
 
         if !changed {
-            break
+            break;
         }
     }
 

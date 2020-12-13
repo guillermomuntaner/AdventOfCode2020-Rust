@@ -128,6 +128,10 @@ mod tests {
     pub fn test_day13() {
         let day13_input = input_utils::read_all("inputs/day13");
         assert_eq!(day13::part1(&day13_input), 2095);
-        assert_eq!(day13::part2(&day13_input), 598411311431841);
+        assert_eq!(day13::part2_search(&day13_input), 598411311431841);
+        assert_eq!(
+            day13::part2_chinese_remainder_theorem(&day13_input),
+            598411311431841
+        );
     }
 }

@@ -113,7 +113,13 @@ pub fn bench_day12(c: &mut Criterion) {
 pub fn bench_day13(c: &mut Criterion) {
     let input = input_utils::read_all("inputs/day13");
     c.bench_function("day 13 pt 1", |b| b.iter(|| day13::part1(&input)));
-    c.bench_function("day 13 pt 2", |b| b.iter(|| day13::part2(&input)));
+    let mut pt2_group = c.benchmark_group("Day 13 Pt 2");
+    pt2_group.bench_function("search using l.c.m.", |b| {
+        b.iter(|| day13::part2_search(&input))
+    });
+    pt2_group.bench_function("chinese remainder", |b| {
+        b.iter(|| day13::part2_chinese_remainder_theorem(&input))
+    });
 }
 
 criterion_group!(

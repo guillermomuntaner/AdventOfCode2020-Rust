@@ -129,7 +129,7 @@ pub fn part1(lines: &[String]) -> i64 {
 //
 // What is the earliest timestamp such that all of the listed bus IDs depart at offsets matching their positions in the list?
 
-pub fn part2(lines: &[String]) -> i64 {
+pub fn part2_search(lines: &[String]) -> i64 {
     let (_, bus_lines) = parse(lines);
     let (timestamp, _) = bus_lines
         .iter()
@@ -142,6 +142,53 @@ pub fn part2(lines: &[String]) -> i64 {
             (timestamp, step * frequency)
         });
     timestamp
+}
+
+pub fn part2_chinese_remainder_theorem(lines: &[String]) -> i64 {
+    let (_, bus_lines) = parse(lines);
+    let mod_and_residues = bus_lines
+        .iter()
+        .map(|(offset, bus_line)| (*bus_line, *bus_line - (*offset % *bus_line)))
+        .collect::<Vec<(i64, i64)>>();
+    chinese_remainder(
+        &mod_and_residues.iter().map(|x| x.1).collect::<Vec<i64>>(),
+        &mod_and_residues.iter().map(|x| x.0).collect::<Vec<i64>>(),
+    )
+    .unwrap()
+}
+
+// Chinese remainder theorem, implementation from rosettacode.
+// https://rosettacode.org/wiki/Chinese_remainder_theorem#Rust
+#[allow(clippy::many_single_char_names)]
+fn egcd(a: i64, b: i64) -> (i64, i64, i64) {
+    if a == 0 {
+        (b, 0, 1)
+    } else {
+        let (g, x, y) = egcd(b % a, a);
+        (g, y - (b / a) * x, x)
+    }
+}
+
+fn mod_inv(x: i64, n: i64) -> Option<i64> {
+    let (g, x, _) = egcd(x, n);
+    if g == 1 {
+        Some((x % n + n) % n)
+    } else {
+        None
+    }
+}
+
+fn chinese_remainder(residues: &[i64], modulii: &[i64]) -> Option<i64> {
+    let prod = modulii.iter().product::<i64>();
+
+    let mut sum = 0;
+
+    for (&residue, &modulus) in residues.iter().zip(modulii) {
+        let p = prod / modulus;
+        sum += residue * mod_inv(p, modulus)? * p
+    }
+
+    Some(sum % prod)
 }
 
 #[cfg(test)]
@@ -160,27 +207,27 @@ mod tests {
         {
             let input_text = "939\n7,13,x,x,59,x,31,19";
             let input: Vec<String> = input_text.lines().map(|line| line.to_string()).collect();
-            assert_eq!(part2(&input), 1068781);
+            assert_eq!(part2_chinese_remainder_theorem(&input), 1068781);
         }
         {
             let input_text = "939\n67,7,59,61";
             let input: Vec<String> = input_text.lines().map(|line| line.to_string()).collect();
-            assert_eq!(part2(&input), 754018);
+            assert_eq!(part2_chinese_remainder_theorem(&input), 754018);
         }
         {
             let input_text = "939\n67,x,7,59,61";
             let input: Vec<String> = input_text.lines().map(|line| line.to_string()).collect();
-            assert_eq!(part2(&input), 779210);
+            assert_eq!(part2_chinese_remainder_theorem(&input), 779210);
         }
         {
             let input_text = "939\n67,7,x,59,61";
             let input: Vec<String> = input_text.lines().map(|line| line.to_string()).collect();
-            assert_eq!(part2(&input), 1261476);
+            assert_eq!(part2_chinese_remainder_theorem(&input), 1261476);
         }
         {
             let input_text = "939\n1789,37,47,1889";
             let input: Vec<String> = input_text.lines().map(|line| line.to_string()).collect();
-            assert_eq!(part2(&input), 1202161486);
+            assert_eq!(part2_chinese_remainder_theorem(&input), 1202161486);
         }
     }
 }

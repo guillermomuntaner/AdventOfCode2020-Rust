@@ -107,4 +107,8 @@ fn main() {
         "Day 13 - Part 2: {}",
         day13::part2_chinese_remainder_theorem(&day13_input)
     );
+
+    let day14_input = input_utils::read_all("inputs/day14");
+    println!("Day 14 - Part 1: {}", day14::part1(&day14_input));
+    println!("Day 14 - Part 2: {}", day14::part2(&day14_input));
 }

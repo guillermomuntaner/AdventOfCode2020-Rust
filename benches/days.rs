@@ -130,19 +130,19 @@ pub fn bench_day14(c: &mut Criterion) {
 
 criterion_group!(
     benches,
-    bench_day1,
-    bench_day2,
-    bench_day3,
-    bench_day4,
-    bench_day5,
-    bench_day6,
-    bench_day7,
-    bench_day8,
-    bench_day9,
-    bench_day10,
-    bench_day11,
-    bench_day12,
-    bench_day13,
+    //bench_day1,
+    //bench_day2,
+    //bench_day3,
+    //bench_day4,
+    //bench_day5,
+    //bench_day6,
+    //bench_day7,
+    //bench_day8,
+    //bench_day9,
+    //bench_day10,
+    //bench_day11,
+    //bench_day12,
+    //bench_day13,
     bench_day14
 );
 criterion_main!(benches);

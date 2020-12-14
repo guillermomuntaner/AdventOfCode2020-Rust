@@ -89,7 +89,6 @@ pub fn part1(lines: &[String]) -> u64 {
 
     let mut current_add = 0_u64;
     let mut current_mask = 0_u64;
-
     let mut memory = HashMap::<u64, u64>::new();
 
     for instruction in instructions {
@@ -104,11 +103,8 @@ pub fn part1(lines: &[String]) -> u64 {
             }
         }
     }
-    let mut acc = 0;
-    for value in memory.values() {
-        acc += value;
-    }
-    acc
+
+    memory.values().sum()
 }
 
 // --- Part Two ---
@@ -167,40 +163,44 @@ pub fn part1(lines: &[String]) -> u64 {
 // Execute the initialization program using an emulator for a version 2 decoder chip. What is the
 // sum of all values left in memory after it completes?
 
+fn decompose_mask_v2(mask_str: &str) -> (u64, u64, Vec<u64>) {
+    let mut or_mask = 0_u64;
+    let mut and_mask = 0_u64;
+    let mut floating_masks: Vec<u64> = vec![0];
+    for (pos, char) in mask_str.chars().rev().enumerate() {
+        let sum = 1 << pos;
+        match char {
+            'X' => {
+                for floating_mask in floating_masks.clone() {
+                    floating_masks.push(floating_mask | sum)
+                }
+            }
+            '1' => {
+                or_mask |= sum;
+                and_mask |= sum;
+            }
+            '0' => and_mask |= sum,
+            _ => panic!("Unexpected char {}", char),
+        }
+    }
+    (or_mask, and_mask, floating_masks)
+}
+
 pub fn part2(lines: &[String]) -> u64 {
     let instructions = parse_instructions(lines);
 
     let mut current_or_mask = 0_u64;
     let mut current_and_mask = 0_u64;
     let mut floating_masks: Vec<u64> = Vec::new();
-
     let mut memory = HashMap::<u64, u64>::new();
 
     for instruction in instructions {
         match instruction {
             Instruction::Mask(mask_str) => {
-                // Part to OR
-                let or_str = mask_str
-                    .chars()
-                    .map(|c| if c == '1' { '1' } else { '0' })
-                    .collect::<String>();
-                current_or_mask = u64::from_str_radix(&or_str, 2).unwrap();
-                // Part to AND: 0 all the floating bits
-                let and_mark_str = mask_str
-                    .chars()
-                    .map(|c| if c == 'X' { '0' } else { '1' })
-                    .collect::<String>();
-                current_and_mask = u64::from_str_radix(&and_mark_str, 2).unwrap();
-                // Part floating: Accumulate all permutations to add.
-                floating_masks.clear();
-                floating_masks.push(0);
-                for (pos, char) in mask_str.chars().rev().enumerate() {
-                    if char == 'X' {
-                        for floating_mask in floating_masks.clone() {
-                            floating_masks.push(floating_mask + 2_u64.pow(pos as u32))
-                        }
-                    }
-                }
+                let (or_mask, and_mask, floating) = decompose_mask_v2(&mask_str);
+                current_or_mask = or_mask;
+                current_and_mask = and_mask;
+                floating_masks = floating;
             }
             Instruction::Mem(address, value) => {
                 let base_masked_address = (address | current_or_mask) & current_and_mask;
@@ -211,11 +211,8 @@ pub fn part2(lines: &[String]) -> u64 {
             }
         }
     }
-    let mut acc = 0;
-    for value in memory.values() {
-        acc += value;
-    }
-    acc
+
+    memory.values().sum()
 }
 
 #[cfg(test)]

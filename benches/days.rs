@@ -130,9 +130,19 @@ pub fn bench_day14(c: &mut Criterion) {
 
 pub fn bench_day15(c: &mut Criterion) {
     //c.bench_function("day 15 pt 1 with a hash map", |b| b.iter(|| day15::part1_hash_map()));
-    c.bench_function("day 15 pt 1 with a pre allocated array", |b| b.iter(|| day15::part1_preallocated_arrray()));
+    c.bench_function("day 15 pt 1 with a pre allocated array", |b| {
+        b.iter(|| day15::part1_preallocated_arrray())
+    });
     //c.bench_function("day 15 pt 2 with a hash map", |b| b.iter(|| day15::part2_hash_map()));
-    c.bench_function("day 15 pt 2 with a pre allocated array", |b| b.iter(|| day15::part2_preallocated_array()));
+    c.bench_function("day 15 pt 2 with a pre allocated array", |b| {
+        b.iter(|| day15::part2_preallocated_array())
+    });
+}
+
+pub fn bench_day16(c: &mut Criterion) {
+    let input = input_utils::read_all("inputs/day16");
+    c.bench_function("day 16 pt 1", |b| b.iter(|| day16::part1(&input)));
+    c.bench_function("day 16 pt 2", |b| b.iter(|| day16::part2(&input)));
 }
 
 criterion_group!(
@@ -151,6 +161,7 @@ criterion_group!(
     bench_day12,
     bench_day13,
     bench_day14,
-    bench_day15
+    bench_day15,
+    bench_day16
 );
 criterion_main!(benches);

@@ -21,8 +21,8 @@ Trying [Rust](https://www.rust-lang.org/learn/get-started) with the [Advent of C
 | 12|⭐⭐ |
 | 13|⭐⭐ |
 | 14|⭐⭐ |
-| 15|     |
-| 16|     |
+| 15|⭐⭐ |
+| 16|⭐⭐ |
 | 17|     |
 | 18|     |
 | 19|     |

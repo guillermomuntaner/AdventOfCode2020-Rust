@@ -31,7 +31,7 @@ pub fn play_preallocated_arrray(numbers: &[u32], target_position: u32) -> u32 {
         timestamps[*number as usize] = position as u32;
     }
 
-    for position in numbers.len() as u32 .. target_position {
+    for position in numbers.len() as u32..target_position {
         let last_number = number as usize;
         let last_position = position - 1;
         number = match timestamps[last_number] {

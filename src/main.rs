@@ -114,4 +114,8 @@ fn main() {
 
     println!("Day 15 - Part 1: {}", day15::part1_preallocated_arrray());
     println!("Day 15 - Part 1: {}", day15::part2_preallocated_array());
+
+    let day16_input = input_utils::read_all("inputs/day16");
+    println!("Day 16 - Part 1: {}", day16::part1(&day16_input));
+    println!("Day 16 - Part 2: {}", day16::part2(&day16_input));
 }

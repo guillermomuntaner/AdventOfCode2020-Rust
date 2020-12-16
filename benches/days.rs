@@ -129,8 +129,10 @@ pub fn bench_day14(c: &mut Criterion) {
 }
 
 pub fn bench_day15(c: &mut Criterion) {
-    c.bench_function("day 15 pt 1", |b| b.iter(|| day15::part1()));
-    c.bench_function("day 15 pt 2", |b| b.iter(|| day15::part2()));
+    //c.bench_function("day 15 pt 1 with a hash map", |b| b.iter(|| day15::part1_hash_map()));
+    c.bench_function("day 15 pt 1 with a pre allocated array", |b| b.iter(|| day15::part1_preallocated_arrray()));
+    //c.bench_function("day 15 pt 2 with a hash map", |b| b.iter(|| day15::part2_hash_map()));
+    c.bench_function("day 15 pt 2 with a pre allocated array", |b| b.iter(|| day15::part2_preallocated_array()));
 }
 
 criterion_group!(

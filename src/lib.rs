@@ -146,7 +146,9 @@ mod tests {
 
     #[test]
     pub fn test_day15() {
-        assert_eq!(day15::part1(), 475);
-        assert_eq!(day15::part2(), 11261);
+        //assert_eq!(day15::part1_hash_map(), 475);
+        assert_eq!(day15::part1_preallocated_arrray(), 475);
+        //assert_eq!(day15::part2(), 11261);
+        assert_eq!(day15::part2_preallocated_array(), 11261);
     }
 }

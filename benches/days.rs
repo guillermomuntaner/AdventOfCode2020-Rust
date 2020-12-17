@@ -145,6 +145,12 @@ pub fn bench_day16(c: &mut Criterion) {
     c.bench_function("day 16 pt 2", |b| b.iter(|| day16::part2(&input)));
 }
 
+pub fn bench_day17(c: &mut Criterion) {
+    let input = input_utils::read_all("inputs/day17");
+    c.bench_function("day 17 pt 1", |b| b.iter(|| day17::part1(&input)));
+    c.bench_function("day 17 pt 2", |b| b.iter(|| day17::part2(&input)));
+}
+
 criterion_group!(
     benches,
     bench_day1,
@@ -162,6 +168,7 @@ criterion_group!(
     bench_day13,
     bench_day14,
     bench_day15,
-    bench_day16
+    bench_day16,
+    bench_day17
 );
 criterion_main!(benches);

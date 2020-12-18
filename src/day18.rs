@@ -44,72 +44,35 @@
 use std::borrow::BorrowMut;
 use std::str::Chars;
 
-#[derive(PartialEq, Debug, Clone)]
-enum Op {
-    Add,
-    Multiply,
-}
-
-#[derive(PartialEq, Debug, Clone)]
 enum Precedence {
     None,
-    Multiplication,
+    Addition,
 }
 
 fn eval_expression(precedence: &Precedence, chars: &mut Chars) -> u64 {
     let mut acc = 0_u64;
-    let mut op: Option<Op> = None;
+    let mut op: fn(u64, u64) -> u64 = |a, b| a + b;
     let mut val = 0_u64;
-
-    fn consume_val(acc: &mut u64, op: &mut Option<Op>, val: &mut u64) {
-        match op.as_ref() {
-            None => return,
-            Some(op) => match op {
-                Op::Add => *acc += *val,
-                Op::Multiply => *acc *= *val,
-            },
-        }
-        *op = None;
-        *val = 0;
-    }
-
-    loop {
-        match chars.next() {
-            None => {
-                consume_val(&mut acc, &mut op, &mut val);
-                return acc;
+    while let Some(char) = chars.next() {
+        match char {
+            '(' => val = eval_expression(precedence, chars),
+            ' ' => {
+                if val != 0 {
+                    acc = op(acc, val);
+                    op = |a, b| a + b;
+                    val = 0;
+                }
             }
-            Some(char) => match char {
-                '(' => match op {
-                    None => acc = eval_expression(precedence, chars),
-                    Some(_) => val = eval_expression(precedence, chars),
-                },
-                ' ' => {
-                    if op.is_some() && val != 0 {
-                        consume_val(&mut acc, &mut op, &mut val)
-                    }
-                }
-                '+' => op = Some(Op::Add),
-                '*' => match precedence {
-                    Precedence::None => op = Some(Op::Multiply),
-                    Precedence::Multiplication => {
-                        op = Some(Op::Multiply);
-                        val = eval_expression(precedence, chars);
-                        consume_val(&mut acc, &mut op, &mut val);
-                        return acc;
-                    }
-                },
-                ')' => {
-                    consume_val(&mut acc, &mut op, &mut val);
-                    return acc;
-                }
-                char => match op {
-                    None => acc = acc * 10 + char.to_digit(10).unwrap() as u64,
-                    Some(_) => val = val * 10 + char.to_digit(10).unwrap() as u64,
-                },
+            '+' => op = |a, b| a + b,
+            '*' => match precedence {
+                Precedence::None => op = |a, b| a * b,
+                Precedence::Addition => return acc * eval_expression(precedence, chars),
             },
+            ')' => return op(acc, val),
+            char => val = val * 10 + char.to_digit(10).unwrap() as u64,
         }
     }
+    op(acc, val)
 }
 
 pub fn part1(lines: &[String]) -> u64 {
@@ -147,7 +110,7 @@ pub fn part1(lines: &[String]) -> u64 {
 pub fn part2(lines: &[String]) -> u64 {
     lines
         .iter()
-        .map(|line| eval_expression(&Precedence::Multiplication, line.chars().borrow_mut()))
+        .map(|line| eval_expression(&Precedence::Addition, line.chars().borrow_mut()))
         .sum()
 }
 
@@ -211,45 +174,42 @@ mod tests {
     #[test]
     pub fn test_eval_expression_pt2() {
         assert_eq!(
-            eval_expression(&Precedence::Multiplication, "2 * 3".chars().borrow_mut()),
+            eval_expression(&Precedence::Addition, "2 * 3".chars().borrow_mut()),
             6
         );
         assert_eq!(
-            eval_expression(&Precedence::Multiplication, "2 + 3".chars().borrow_mut()),
+            eval_expression(&Precedence::Addition, "2 + 3".chars().borrow_mut()),
             5
         );
         assert_eq!(
-            eval_expression(
-                &Precedence::Multiplication,
-                "2 * 2 + 3".chars().borrow_mut()
-            ),
+            eval_expression(&Precedence::Addition, "2 * 2 + 3".chars().borrow_mut()),
             10
         );
 
         assert_eq!(
             eval_expression(
-                &Precedence::Multiplication,
+                &Precedence::Addition,
                 "1 + (2 * 3) + (4 * (5 + 6))".chars().borrow_mut()
             ),
             51
         );
         assert_eq!(
             eval_expression(
-                &Precedence::Multiplication,
+                &Precedence::Addition,
                 "2 * 3 + (4 * 5)".chars().borrow_mut()
             ),
             46
         );
         assert_eq!(
             eval_expression(
-                &Precedence::Multiplication,
+                &Precedence::Addition,
                 "5 + (8 * 3 + 9 + 3 * 4 * 3)".chars().borrow_mut()
             ),
             1445
         );
         assert_eq!(
             eval_expression(
-                &Precedence::Multiplication,
+                &Precedence::Addition,
                 "5 * 9 * (7 * 3 * 3 + 9 * 3 + (8 + 6 * 4))"
                     .chars()
                     .borrow_mut()
@@ -258,7 +218,7 @@ mod tests {
         );
         assert_eq!(
             eval_expression(
-                &Precedence::Multiplication,
+                &Precedence::Addition,
                 "((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2"
                     .chars()
                     .borrow_mut()
@@ -267,36 +227,33 @@ mod tests {
         );
         // Note: Decomposition of the last part that was failing
         assert_eq!(
-            eval_expression(
-                &Precedence::Multiplication,
-                "(2 + 4 * 9)".chars().borrow_mut()
-            ),
+            eval_expression(&Precedence::Addition, "(2 + 4 * 9)".chars().borrow_mut()),
             54
         );
         assert_eq!(
             eval_expression(
-                &Precedence::Multiplication,
+                &Precedence::Addition,
                 "(6 + 9 * 8 + 6)".chars().borrow_mut()
             ),
             210
         );
         assert_eq!(
             eval_expression(
-                &Precedence::Multiplication,
+                &Precedence::Addition,
                 "(6 + 9 * 8 + 6) + 6".chars().borrow_mut()
             ),
             216
         );
         assert_eq!(
             eval_expression(
-                &Precedence::Multiplication,
+                &Precedence::Addition,
                 "((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6)".chars().borrow_mut()
             ),
             11664
         );
         assert_eq!(
             eval_expression(
-                &Precedence::Multiplication,
+                &Precedence::Addition,
                 "((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2"
                     .chars()
                     .borrow_mut()
@@ -305,7 +262,7 @@ mod tests {
         );
         assert_eq!(
             eval_expression(
-                &Precedence::Multiplication,
+                &Precedence::Addition,
                 "((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 "
                     .chars()
                     .borrow_mut()

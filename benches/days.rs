@@ -151,24 +151,31 @@ pub fn bench_day17(c: &mut Criterion) {
     c.bench_function("day 17 pt 2", |b| b.iter(|| day17::part2(&input)));
 }
 
+pub fn bench_day18(c: &mut Criterion) {
+    let input = input_utils::read_all("inputs/day18");
+    c.bench_function("day 18 pt 1", |b| b.iter(|| day18::part1(&input)));
+    c.bench_function("day 18 pt 2", |b| b.iter(|| day18::part2(&input)));
+}
+
 criterion_group!(
     benches,
-    bench_day1,
-    bench_day2,
-    bench_day3,
-    bench_day4,
-    bench_day5,
-    bench_day6,
-    bench_day7,
-    bench_day8,
-    bench_day9,
-    bench_day10,
-    bench_day11,
-    bench_day12,
-    bench_day13,
-    bench_day14,
-    bench_day15,
-    bench_day16,
-    bench_day17
+    //bench_day1,
+    //bench_day2,
+    //bench_day3,
+    //bench_day4,
+    //bench_day5,
+    //bench_day6,
+    //bench_day7,
+    //bench_day8,
+    //bench_day9,
+    //bench_day10,
+    //bench_day11,
+    //bench_day12,
+    //bench_day13,
+    //bench_day14,
+    //bench_day15,
+    //bench_day16,
+    //bench_day17,
+    bench_day18
 );
 criterion_main!(benches);

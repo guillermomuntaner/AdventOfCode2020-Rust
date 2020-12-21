@@ -9,6 +9,7 @@ pub mod day16;
 pub mod day17;
 pub mod day18;
 pub mod day19;
+pub mod day21;
 pub mod day2;
 pub mod day3;
 pub mod day4;
@@ -23,7 +24,7 @@ pub mod input_utils;
 #[cfg(test)]
 mod tests {
     use crate::{
-        day1, day10, day11, day12, day13, day14, day15, day16, day17, day18, day19, day2, day3,
+        day1, day10, day11, day12, day13, day14, day15, day16, day17, day18, day19, day21, day2, day3,
         day4, day5, day6, day7, day8, day9, input_utils,
     };
 
@@ -182,5 +183,12 @@ mod tests {
         let day19_input = input_utils::read_all("inputs/day19");
         assert_eq!(day19::part1(&day19_input), 299);
         assert_eq!(day19::part2(&day19_input, true), 414);
+    }
+
+    #[test]
+    pub fn test_day21() {
+        let day21_input = input_utils::read_all("inputs/day21");
+        assert_eq!(day21::part1(&day21_input), 1815);
+        assert_eq!(day21::part2(&day21_input), String::from("kllgt,jrnqx,ljvx,zxstb,gnbxs,mhtc,hfdxb,hbfnkq"));
     }
 }

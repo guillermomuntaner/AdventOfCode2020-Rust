@@ -110,8 +110,8 @@ fn parse_instruction(line: &str) -> (u32, Rule) {
         }
     }
     acc_group.push(acc);
-    groups.push(acc_group.clone());
-    return (idx, Rule::Bridge(groups));
+    groups.push(acc_group);
+    (idx, Rule::Bridge(groups))
 }
 
 fn count_valid_naive(messages: &[String], rules: HashMap<u32, Rule>) -> usize {
@@ -155,7 +155,7 @@ fn count_valid_naive(messages: &[String], rules: HashMap<u32, Rule>) -> usize {
 fn count_valid(messages: &[String], rules: HashMap<u32, Rule>) -> usize {
     /// Recursively searches if the given string is valid according to the given rule and returns
     /// all valid possibilities it finds.
-    fn is_valid(message: &String, pos: usize, idx: &u32, rules: &HashMap<u32, Rule>) -> Vec<usize> {
+    fn is_valid(message: &str, pos: usize, idx: &u32, rules: &HashMap<u32, Rule>) -> Vec<usize> {
         if pos >= message.chars().count() {
             return vec![];
         }

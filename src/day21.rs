@@ -36,12 +36,12 @@
 // Determine which ingredients cannot possibly contain any of the allergens in your list.
 // How many times do any of those ingredients appear?
 
-use std::collections::{HashSet, HashMap};
+use std::collections::{HashMap, HashSet};
 
 #[derive(PartialEq, Debug, Clone)]
 struct Food {
     ingredients: HashSet<String>,
-    allergens: HashSet<String>
+    allergens: HashSet<String>,
 }
 
 fn parse_food(line: &str) -> Food {
@@ -53,13 +53,18 @@ fn parse_food(line: &str) -> Food {
     let allergens_str: String = pars.next().unwrap().chars().skip(9).collect();
 
     Food {
-        ingredients: ingredients_str.split(' ').map(|str| str.to_string()).collect(),
-        allergens: allergens_str.split(", ").map(|str| str.to_string()).collect()
+        ingredients: ingredients_str
+            .split(' ')
+            .map(|str| str.to_string())
+            .collect(),
+        allergens: allergens_str
+            .split(", ")
+            .map(|str| str.to_string())
+            .collect(),
     }
 }
 
 pub fn part1(lines: &[String]) -> usize {
-
     let foods: Vec<_> = lines.iter().map(|line| parse_food(line)).collect();
 
     let mut allergens_to_possible_ingredients = HashMap::<String, HashSet<String>>::new();
@@ -70,9 +75,12 @@ pub fn part1(lines: &[String]) -> usize {
             match allergens_to_possible_ingredients.get(allergen) {
                 None => {
                     allergens_to_possible_ingredients.insert(allergen.clone(), ingredients);
-                },
+                }
                 Some(possible_ingredients) => {
-                    let intersection = possible_ingredients.intersection(&ingredients).cloned().collect::<HashSet<String>>();
+                    let intersection = possible_ingredients
+                        .intersection(&ingredients)
+                        .cloned()
+                        .collect::<HashSet<String>>();
                     allergens_to_possible_ingredients.insert(allergen.clone(), intersection);
                 }
             }
@@ -81,14 +89,25 @@ pub fn part1(lines: &[String]) -> usize {
 
     println!("{:?}", allergens_to_possible_ingredients);
 
-    let ingredients_that_may_contain_allergens: HashSet<String> = allergens_to_possible_ingredients.values().flatten().cloned().collect();
-    println!("Ingredients that may contain allergens: {:?}", ingredients_that_may_contain_allergens);
+    let ingredients_that_may_contain_allergens: HashSet<String> = allergens_to_possible_ingredients
+        .values()
+        .flatten()
+        .cloned()
+        .collect();
+    println!(
+        "Ingredients that may contain allergens: {:?}",
+        ingredients_that_may_contain_allergens
+    );
 
-    foods.iter().map(|food| {
-        food.ingredients.iter()
-            .filter(|ingredient| !ingredients_that_may_contain_allergens.contains(ingredient.clone()))
-            .count()
-    }).sum()
+    foods
+        .iter()
+        .map(|food| {
+            food.ingredients
+                .iter()
+                .filter(|ingredient| !ingredients_that_may_contain_allergens.contains(*ingredient))
+                .count()
+        })
+        .sum()
 }
 
 // --- Part Two ---
@@ -117,9 +136,12 @@ pub fn part2(lines: &[String]) -> String {
             match allergens_to_possible_ingredients.get(allergen) {
                 None => {
                     allergens_to_possible_ingredients.insert(allergen.clone(), ingredients);
-                },
+                }
                 Some(possible_ingredients) => {
-                    let intersection = possible_ingredients.intersection(&ingredients).cloned().collect::<HashSet<String>>();
+                    let intersection = possible_ingredients
+                        .intersection(&ingredients)
+                        .cloned()
+                        .collect::<HashSet<String>>();
                     allergens_to_possible_ingredients.insert(allergen.clone(), intersection);
                 }
             }
@@ -131,22 +153,31 @@ pub fn part2(lines: &[String]) -> String {
     while !allergens_to_possible_ingredients.is_empty() {
         let copy = allergens_to_possible_ingredients.clone();
         for (allergen, ingredients) in copy {
-            let unidentified_ingredients: Vec<_> = ingredients.iter()
-                .filter(|ingredient| allergen_ingredient.iter().find(|(_, identified_ingredient)| *ingredient == identified_ingredient).is_none())
+            let unidentified_ingredients: Vec<_> = ingredients
+                .iter()
+                .filter(|ingredient| {
+                    allergen_ingredient
+                        .iter()
+                        .find(|(_, identified_ingredient)| *ingredient == identified_ingredient)
+                        .is_none()
+                })
                 .collect();
             if unidentified_ingredients.len() == 1 {
                 allergen_ingredient.push((allergen.clone(), unidentified_ingredients[0].clone()));
                 allergens_to_possible_ingredients.remove(&allergen);
             }
         }
-
     }
 
     println!("{:?}", allergen_ingredient);
 
-
-    allergen_ingredient.sort_by_key(|(allergen,_)| allergen.clone());
-    allergen_ingredient.iter().map(|(_, ingredient)| ingredient).cloned().collect::<Vec<String>>().join(",")
+    allergen_ingredient.sort_by_key(|(allergen, _)| allergen.clone());
+    allergen_ingredient
+        .iter()
+        .map(|(_, ingredient)| ingredient)
+        .cloned()
+        .collect::<Vec<String>>()
+        .join(",")
 }
 
 #[cfg(test)]
@@ -158,8 +189,19 @@ mod tests {
         assert_eq!(
             parse_food(&"mxmxvkd kfcds sqjhc nhms (contains dairy, fish)"),
             Food {
-                ingredients: vec!["mxmxvkd".to_string(), "kfcds".to_string(), "sqjhc".to_string(), "nhms".to_string()].iter().cloned().collect(),
-                allergens: vec!["dairy".to_string(), "fish".to_string()].iter().cloned().collect()
+                ingredients: vec![
+                    "mxmxvkd".to_string(),
+                    "kfcds".to_string(),
+                    "sqjhc".to_string(),
+                    "nhms".to_string()
+                ]
+                .iter()
+                .cloned()
+                .collect(),
+                allergens: vec!["dairy".to_string(), "fish".to_string()]
+                    .iter()
+                    .cloned()
+                    .collect()
             }
         )
     }

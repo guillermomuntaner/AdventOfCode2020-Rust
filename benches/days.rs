@@ -168,26 +168,36 @@ pub fn bench_day19(c: &mut Criterion) {
     c.bench_function("day 19 pt 2", |b| b.iter(|| day19::part2(&input, true)));
 }
 
+pub fn bench_day_23(c: &mut Criterion) {
+    c.bench_function("day 23 pat 1", |b| {
+        b.iter(|| day23::part1(&538914762))
+    });
+    c.bench_function("day 23 part 2", |b| {
+        b.iter(|| day23::part2(&538914762))
+    });
+}
+
 criterion_group!(
     benches,
-    bench_day1,
-    bench_day2,
-    bench_day3,
-    bench_day4,
-    bench_day5,
-    bench_day6,
-    bench_day7,
-    bench_day8,
-    bench_day9,
-    bench_day10,
-    bench_day11,
-    bench_day12,
-    bench_day13,
-    bench_day14,
-    bench_day15,
-    bench_day16,
-    bench_day17,
-    bench_day18,
-    bench_day19
+    //bench_day1,
+    //bench_day2,
+    //bench_day3,
+    //bench_day4,
+    //bench_day5,
+    //bench_day6,
+    //bench_day7,
+    //bench_day8,
+    //bench_day9,
+    //bench_day10,
+    //bench_day11,
+    //bench_day12,
+    //bench_day13,
+    //bench_day14,
+    //bench_day15,
+    //bench_day16,
+    //bench_day17,
+    //bench_day18,
+    //bench_day19,
+    bench_day_23
 );
 criterion_main!(benches);

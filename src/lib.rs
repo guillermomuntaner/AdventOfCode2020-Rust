@@ -215,5 +215,6 @@ mod tests {
     #[test]
     pub fn test_day23() {
         assert_eq!(day23::part1(&538914762), 54327968);
+        assert_eq!(day23::part2(&538914762), 157410423276);
     }
 }

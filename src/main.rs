@@ -144,4 +144,5 @@ fn main() {
     println!("Day 22 - Part 2: {}", day22::part2(&day22_input));
 
     println!("Day 23 - Part 1: {}", day23::part1(&538914762));
+    println!("Day 23 - Part 2: {}", day23::part2(&538914762));
 }

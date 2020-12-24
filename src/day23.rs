@@ -87,7 +87,9 @@
 //
 // Using your labeling, simulate 100 moves. What are the labels on the cups after cup 1?
 
-fn decompose(n: usize) -> Vec<usize> {
+use std::collections::HashMap;
+
+pub fn decompose(n: usize) -> Vec<usize> {
     fn decompose_inner(n: usize, xs: &mut Vec<usize>) {
         if n >= 10 {
             decompose_inner(n / 10, xs);
@@ -99,33 +101,26 @@ fn decompose(n: usize) -> Vec<usize> {
     xs
 }
 
-fn play(cups: &mut Vec<usize>) {
+pub fn play(cups: &mut Vec<usize>) {
     let cups_count = cups.len();
 
     let cup1 = cups.remove(1);
     let cup2 = cups.remove(1);
     let cup3 = cups.remove(1);
 
-    let index: usize;
     let mut destination = cups[0];
     loop {
         destination -= 1;
-        if destination == 0 {
-            destination = cups_count;
-        }
-        match cups
-            .iter()
-            .enumerate()
-            .find(|(_, cup)| **cup == destination)
-        {
-            None => continue,
-            Some((pos, _)) => {
-                index = pos;
-                break;
-            }
+        if destination == 0 { destination = cups_count; }
+        if destination != cup1 && destination != cup2 && destination != cup3 {
+            break
         }
     }
-    println!("Destination: {} at index {}", destination, index);
+    let index = cups
+        .iter()
+        .enumerate()
+        .find(|(_, cup)| **cup == destination).unwrap()
+        .0;
 
     cups.insert(index + 1, cup3);
     cups.insert(index + 1, cup2);
@@ -142,18 +137,90 @@ pub fn part1(input: &usize) -> usize {
         play(cups)
     }
 
-    println!("{:?}", cups);
-
     let mut acc = 0_usize;
     let pos_of_1 = cups.iter().position(|cup| *cup == 1).unwrap();
     for i in 1..cups.len() {
         let j = (i + pos_of_1) % cups.len();
         acc = acc * 10 + cups[j];
     }
-
-    // 86725934 (too high)
-
     acc
+}
+
+// --- Part Two ---
+// Due to what you can only assume is a mistranslation (you're not exactly fluent in Crab), you are
+// quite surprised when the crab starts arranging many cups in a circle on your raft - one million
+// (1000000) in total.
+//
+// Your labeling is still correct for the first few cups; after that, the remaining cups are just
+// numbered in an increasing fashion starting from the number after the highest number in your list
+// and proceeding one by one until one million is reached. (For example, if your labeling were
+// 54321, the cups would be numbered 5, 4, 3, 2, 1, and then start counting up from 6 until one
+// million is reached.) In this way, every number from one through one million is used exactly once.
+//
+// After discovering where you made the mistake in translating Crab Numbers, you realize the small
+// crab isn't going to do merely 100 moves; the crab is going to do ten million (10000000) moves!
+//
+// The crab is going to hide your stars - one each - under the two cups that will end up immediately
+// clockwise of cup 1. You can have them if you predict what the labels on those cups will be when
+// the crab is finished.
+//
+// In the above example (389125467), this would be 934001 and then 159792; multiplying these
+// together produces 149245887792.
+//
+// Determine which two cups will end up immediately clockwise of cup 1. What do you get if you
+// multiply their labels together?
+
+
+pub fn play_linked(current_cup: usize, cups: &mut HashMap<usize, usize>) {
+    // Identify 3 next cups
+    // [target][cup1][cup2][cup3][next]
+    // [target][next] 3 8 9 1 2 5
+    let cup1 = *cups.get(&current_cup).unwrap();
+    let cup2 = *cups.get(&cup1).unwrap();
+    let cup3 = *cups.get(&cup2).unwrap();
+    let next = *cups.get(&cup3).unwrap();
+    cups.insert(current_cup, next);
+
+    // Find insertion point
+    let mut destination = current_cup;
+    loop {
+        destination -= 1;
+        if destination == 0 { destination = cups.len(); }
+        if destination != cup1 && destination != cup2 && destination != cup3 {
+            break
+        }
+    }
+
+    // Insert the 3 cups between:
+    // [destination][next]
+    // [destination][cup1][cup2][cup3][next]
+    let next = *cups.get(&destination).unwrap();
+    cups.insert(destination, cup1);
+    cups.insert(cup3, next);
+}
+
+pub fn part2(input: &usize) -> usize {
+    let cups = &mut decompose(*input);
+    for i in cups.len() + 1 ..= 1000000 {
+        cups.push(i)
+    }
+
+    let mut current_cup = cups[0];
+    let cup_to_next_cup: &mut HashMap<usize, usize> = &mut HashMap::new();
+
+    for (i, cup) in cups.iter().enumerate() {
+        let next_cup = cups[(i + 1) % cups.len()];
+        cup_to_next_cup.insert(*cup, next_cup);
+    }
+
+    for _ in 0..10000000 {
+        play_linked(current_cup, cup_to_next_cup);
+        current_cup = *cup_to_next_cup.get(&current_cup).unwrap();
+    }
+
+    let cup_after_1 = *cup_to_next_cup.get(&1).unwrap();
+    let cup_after_cup_after_1 = *cup_to_next_cup.get(&cup_after_1).unwrap();
+    cup_after_1 * cup_after_cup_after_1
 }
 
 #[cfg(test)]
@@ -183,5 +250,10 @@ mod tests {
         assert_eq!(*cups, vec![5, 7, 4, 1, 8, 3, 9, 2, 6]);
         play(cups);
         assert_eq!(*cups, vec![8, 3, 7, 4, 1, 9, 2, 6, 5]);
+    }
+
+    #[test]
+    pub fn test_part2() {
+        assert_eq!(part2(&389125467), 149245887792);
     }
 }

@@ -169,12 +169,8 @@ pub fn bench_day19(c: &mut Criterion) {
 }
 
 pub fn bench_day_23(c: &mut Criterion) {
-    c.bench_function("day 23 pat 1", |b| {
-        b.iter(|| day23::part1(&538914762))
-    });
-    c.bench_function("day 23 part 2", |b| {
-        b.iter(|| day23::part2(&538914762))
-    });
+    c.bench_function("day 23 pat 1", |b| b.iter(|| day23::part1(&538914762)));
+    c.bench_function("day 23 part 2", |b| b.iter(|| day23::part2(&538914762)));
 }
 
 criterion_group!(

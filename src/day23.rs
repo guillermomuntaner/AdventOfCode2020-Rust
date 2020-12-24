@@ -87,8 +87,6 @@
 //
 // Using your labeling, simulate 100 moves. What are the labels on the cups after cup 1?
 
-use std::collections::HashMap;
-
 pub fn decompose(n: usize) -> Vec<usize> {
     fn decompose_inner(n: usize, xs: &mut Vec<usize>) {
         if n >= 10 {
@@ -111,15 +109,18 @@ pub fn play(cups: &mut Vec<usize>) {
     let mut destination = cups[0];
     loop {
         destination -= 1;
-        if destination == 0 { destination = cups_count; }
+        if destination == 0 {
+            destination = cups_count;
+        }
         if destination != cup1 && destination != cup2 && destination != cup3 {
-            break
+            break;
         }
     }
     let index = cups
         .iter()
         .enumerate()
-        .find(|(_, cup)| **cup == destination).unwrap()
+        .find(|(_, cup)| **cup == destination)
+        .unwrap()
         .0;
 
     cups.insert(index + 1, cup3);
@@ -170,56 +171,58 @@ pub fn part1(input: &usize) -> usize {
 // Determine which two cups will end up immediately clockwise of cup 1. What do you get if you
 // multiply their labels together?
 
-
-pub fn play_linked(current_cup: usize, cups: &mut HashMap<usize, usize>) {
+pub fn play_linked(current_cup: usize, cups: &mut Vec<usize>) {
     // Identify 3 next cups
     // [target][cup1][cup2][cup3][next]
     // [target][next] 3 8 9 1 2 5
-    let cup1 = *cups.get(&current_cup).unwrap();
-    let cup2 = *cups.get(&cup1).unwrap();
-    let cup3 = *cups.get(&cup2).unwrap();
-    let next = *cups.get(&cup3).unwrap();
-    cups.insert(current_cup, next);
+    let cup1 = cups[current_cup];
+    let cup2 = cups[cup1];
+    let cup3 = cups[cup2];
+    let next = cups[cup3];
+    cups[current_cup] = next;
 
     // Find insertion point
     let mut destination = current_cup;
     loop {
         destination -= 1;
-        if destination == 0 { destination = cups.len(); }
+        if destination == 0 {
+            destination = cups.len() - 1;
+        }
         if destination != cup1 && destination != cup2 && destination != cup3 {
-            break
+            break;
         }
     }
 
     // Insert the 3 cups between:
     // [destination][next]
     // [destination][cup1][cup2][cup3][next]
-    let next = *cups.get(&destination).unwrap();
-    cups.insert(destination, cup1);
-    cups.insert(cup3, next);
+    let next = cups[destination];
+    cups[destination] = cup1;
+    cups[cup3] = next;
 }
 
 pub fn part2(input: &usize) -> usize {
     let cups = &mut decompose(*input);
-    for i in cups.len() + 1 ..= 1000000 {
+    for i in cups.len() + 1..=1000000 {
         cups.push(i)
     }
 
     let mut current_cup = cups[0];
-    let cup_to_next_cup: &mut HashMap<usize, usize> = &mut HashMap::new();
+    let cup_to_next_cup = &mut vec![0_usize; cups.len()];
+    cup_to_next_cup.insert(0, 0);
 
     for (i, cup) in cups.iter().enumerate() {
         let next_cup = cups[(i + 1) % cups.len()];
-        cup_to_next_cup.insert(*cup, next_cup);
+        cup_to_next_cup[*cup] = next_cup;
     }
 
     for _ in 0..10000000 {
         play_linked(current_cup, cup_to_next_cup);
-        current_cup = *cup_to_next_cup.get(&current_cup).unwrap();
+        current_cup = cup_to_next_cup[current_cup];
     }
 
-    let cup_after_1 = *cup_to_next_cup.get(&1).unwrap();
-    let cup_after_cup_after_1 = *cup_to_next_cup.get(&cup_after_1).unwrap();
+    let cup_after_1 = cup_to_next_cup[1];
+    let cup_after_cup_after_1 = cup_to_next_cup[cup_after_1];
     cup_after_1 * cup_after_cup_after_1
 }
 

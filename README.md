@@ -4,7 +4,7 @@ Trying [Rust](https://www.rust-lang.org/learn/get-started) with the [Advent of C
 
 ![Continuous integration](https://github.com/guillermomuntaner/AdventOfCode2020-Rust/workflows/Continuous%20integration/badge.svg?branch=main)
 
-### Progress
+### Progress: Completed 🎉
 |Day|Stars|
 |---|:---:|
 | 1 |⭐️⭐ |
@@ -31,4 +31,4 @@ Trying [Rust](https://www.rust-lang.org/learn/get-started) with the [Advent of C
 | 22|⭐⭐ |
 | 23|⭐⭐ |
 | 24|⭐⭐ |
-| 25|     |
+| 25|⭐⭐ |

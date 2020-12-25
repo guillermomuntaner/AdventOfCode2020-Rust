@@ -30,5 +30,5 @@ Trying [Rust](https://www.rust-lang.org/learn/get-started) with the [Advent of C
 | 21|⭐⭐ |
 | 22|⭐⭐ |
 | 23|⭐⭐ |
-| 24|     |
+| 24|⭐⭐ |
 | 25|     |
